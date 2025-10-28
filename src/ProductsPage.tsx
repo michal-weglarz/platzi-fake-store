@@ -1,6 +1,6 @@
 import {useQuery} from "@tanstack/react-query";
 
-type Category = {
+interface Category {
     id: number;
     name: string;
     slug: string;
@@ -9,7 +9,7 @@ type Category = {
     updatedAt: string;
 };
 
-type Product = {
+interface Product {
     id: number;
     title: string;
     slug: string;
@@ -28,7 +28,7 @@ function ProductsPage() {
                 const response = await fetch("https://api.escuelajs.co/api/v1/products");
                 return await response.json()
             },
-            staleTime: Infinity,
+  
         },
     )
 
@@ -74,6 +74,9 @@ function ProductsPage() {
                                 <div className={"flex flex-row gap-4"}>
                                     <div className="flex flex-col gap-2 w-fit list-col-wrap">
                                         <p className="text-xl">{product.title}</p>
+                                        <div className="text-xs uppercase font-semibold opacity-60">
+                                            {product.category.name}
+                                        </div>
                                         <p className="text-xs opacity-60">
                                             {product.description}
                                         </p>
