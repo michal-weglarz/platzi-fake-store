@@ -23,23 +23,40 @@ type Product = {
 
 function ProductsPage() {
     const query = useQuery({
-        queryKey: ['products'],
-        queryFn: async (): Promise<Array<Product>> => {
-            const response = await fetch("https://api.escuelajs.co/api/v1/products");
-            return await response.json()
+            queryKey: ['products'],
+            queryFn: async (): Promise<Array<Product>> => {
+                const response = await fetch("https://api.escuelajs.co/api/v1/products");
+                return await response.json()
+            },
+            staleTime: Infinity,
         },
-    })
+    )
 
     if (query.isLoading) {
         return "Loading..."
     }
     if (query.data) {
         return (
-            <ul>
-                {query.data.map(product => (
-                    <li key={product.id}>{product.title}</li>
-                ))}
-            </ul>
+            <>
+                <h1 className="p-4 pb-2 text-3xl font-bold tracking-wide">Products</h1>
+                <ul className="list bg-base-100 rounded-box shadow-md">
+                    {query.data
+                        .map(product => (
+                            <li key={product.id} className="list-row">
+                                <img className="size-48 rounded-box" src={product.images[0]} alt={product.title}/>
+                                <div className={"flex flex-row gap-4"}>
+                                    <div className="flex flex-col gap-2 w-fit list-col-wrap">
+                                        <p className="text-xl">{product.title}</p>
+                                        <p className="text-xs opacity-60">
+                                            {product.description}
+                                        </p>
+                                    </div>
+                                    <div className={"flex w-fit min-w-16 font-semibold text-lg"}>${product.price}</div>
+                                </div>
+                            </li>
+                        ))}
+                </ul>
+            </>
         )
     }
     return 'error';
