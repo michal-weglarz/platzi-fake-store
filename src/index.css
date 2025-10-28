@@ -1,3 +1,8 @@
 @import "tailwindcss";
 
-@plugin "daisyui";
+@plugin "daisyui" {
+    themes: light --default, dark --prefersdark, cupcake;
+}
+
+/*daisyUI can be configured to use Tailwind's dark: prefix*/
+@custom-variant dark (&:where([data-theme=night], [data-theme=night] *));

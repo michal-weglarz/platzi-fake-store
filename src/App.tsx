@@ -2,6 +2,7 @@ import {Route, Switch} from "wouter";
 import {lazy} from "react";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import Navbar from "./Navbar.tsx";
+import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 const LoginPage = lazy(() => import('./LoginPage'));
 const ProductsPage = lazy(() => import('./ProductsPage'));
@@ -29,6 +30,7 @@ function App() {
                     <Route>404: No such page!</Route>
                 </Switch>
             </main>
+            <ReactQueryDevtools initialIsOpen={true}/>
         </QueryClientProvider>
     )
 }

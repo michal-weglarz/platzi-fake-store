@@ -33,7 +33,34 @@ function ProductsPage() {
     )
 
     if (query.isLoading) {
-        return "Loading..."
+        return (
+            <>
+                <h1 className="p-4 pb-2 text-3xl font-bold tracking-wide">Products</h1>
+                <ul className="list bg-base-100 rounded-box shadow-md">
+                    <li className="list-row">
+                        <div className="skeleton h-48 w-48"></div>
+                        <div className={"flex flex-col gap-4"}>
+                            <div className="skeleton h-4 w-64"></div>
+                            <div className="skeleton h-8 w-full"></div>
+                        </div>
+                    </li>
+                    <li className="list-row">
+                        <div className="skeleton h-48 w-48"></div>
+                        <div className={"flex flex-col gap-4"}>
+                            <div className="skeleton h-4 w-64"></div>
+                            <div className="skeleton h-8 w-full"></div>
+                        </div>
+                    </li>
+                    <li className="list-row">
+                        <div className="skeleton h-48 w-48"></div>
+                        <div className={"flex flex-col gap-4"}>
+                            <div className="skeleton h-4 w-64"></div>
+                            <div className="skeleton h-8 w-full"></div>
+                        </div>
+                    </li>
+                </ul>
+            </>
+        )
     }
     if (query.data) {
         return (
@@ -51,7 +78,8 @@ function ProductsPage() {
                                             {product.description}
                                         </p>
                                     </div>
-                                    <div className={"flex w-fit min-w-16 font-semibold text-lg"}>${product.price}</div>
+                                    <div
+                                        className={"flex w-fit min-w-16 font-semibold text-lg"}>${product.price}</div>
                                 </div>
                             </li>
                         ))}
@@ -59,8 +87,11 @@ function ProductsPage() {
             </>
         )
     }
-    return 'error';
+    if (query.isError) {
+        return 'error';
+    }
 
+    return null
 }
 
 export default ProductsPage;
