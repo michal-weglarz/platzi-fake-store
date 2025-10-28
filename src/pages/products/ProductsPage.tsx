@@ -28,7 +28,7 @@ function ProductsPage() {
                 const response = await fetch("https://api.escuelajs.co/api/v1/products");
                 return await response.json()
             },
-  
+
         },
     )
 
@@ -62,6 +62,9 @@ function ProductsPage() {
             </>
         )
     }
+    if (query.error) {
+        return 'error';
+    }
     if (query.data) {
         return (
             <>
@@ -90,9 +93,7 @@ function ProductsPage() {
             </>
         )
     }
-    if (query.isError) {
-        return 'error';
-    }
+
 
     return null
 }
