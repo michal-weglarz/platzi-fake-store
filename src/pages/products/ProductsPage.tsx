@@ -73,9 +73,18 @@ function ProductsPage() {
                     {query.data
                         .map(product => (
                             <li key={product.id} className="list-row">
-                                <img className="size-48 rounded-box" src={product.images[0]} alt={product.title}/>
+
+                                <figure className="hover-gallery max-w-48">
+                                    {product.images.length > 1 ?
+                                        product.images.map(image => (
+                                            <img className="size-48 rounded-box" src={image} alt={product.title}/>
+                                        )) :
+                                        <img className="size-48 rounded-box" src={product.images[0]}
+                                             alt={product.title}/>}
+                                </figure>
+
                                 <div className={"flex flex-row gap-4"}>
-                                    <div className="flex flex-col gap-2 w-fit list-col-wrap">
+                                    <div className="flex flex-col gap-2 list-col-wrap">
                                         <p className="text-xl">{product.title}</p>
                                         <div className="text-xs uppercase font-semibold opacity-60">
                                             {product.category.name}

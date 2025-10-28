@@ -13,7 +13,7 @@ function App() {
     return (
         <QueryClientProvider client={queryClient}>
             <Navbar/>
-            <main className="max-w-6xl mx-auto">
+            <main className="max-w-5xl mx-auto">
                 <Switch>
                     <Route path="/login">
                         <Suspense fallback={<PageLoading/>}>
