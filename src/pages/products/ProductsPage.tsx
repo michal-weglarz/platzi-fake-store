@@ -1,4 +1,8 @@
-import {useQuery} from "@tanstack/react-query";
+import {keepPreviousData, useQuery} from "@tanstack/react-query";
+import {type ChangeEvent} from "react";
+import {useSearchParams} from "wouter";
+import PageLoading from "../../components/PageLoading.tsx";
+import Pagination from "./Pagination.tsx";
 
 interface Category {
     id: number;
@@ -21,16 +25,42 @@ interface Product {
     updatedAt: string;
 };
 
+const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PAGE = 0;
+
+
 function ProductsPage() {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const page = searchParams.get('page') ?? DEFAULT_PAGE.toString();
+    const pageSize = searchParams.get('pageSize') ?? DEFAULT_PAGE_SIZE.toString();
+
+
     const query = useQuery({
-            queryKey: ['products'],
+            queryKey: ['products', page, pageSize],
             queryFn: async (): Promise<Array<Product>> => {
-                const response = await fetch("https://api.escuelajs.co/api/v1/products");
+                const offset = parseInt(page) * parseInt(pageSize);
+                const response = await fetch(`https://api.escuelajs.co/api/v1/products?offset=${offset}&limit=${pageSize}`);
                 return await response.json()
             },
-
+            placeholderData: keepPreviousData,
         },
     )
+
+    const changeSelectedPage = (page: number) => {
+        setSearchParams({
+            page: page.toString(),
+            pageSize: pageSize.toString(),
+        })
+    }
+
+    const changeSelectedPageSize = (event: ChangeEvent<HTMLSelectElement>) => {
+        const value = event.target.value;
+        setSearchParams({
+            // It makes sense to reset the selected page when changing the size to avoid a blank page.
+            page: "0",
+            pageSize: value,
+        })
+    }
 
     if (query.isLoading) {
         return (
@@ -66,22 +96,31 @@ function ProductsPage() {
         return 'error';
     }
     if (query.data) {
+
         return (
-            <>
-                <h1 className="p-4 pb-2 text-3xl font-bold tracking-wide">Products</h1>
+            <div className={"flex flex-col gap-4 items-end p-4"}>
+                <h1 className="p-4 pb-2 text-3xl font-bold tracking-wide self-start">Products</h1>
+                <Pagination
+                    page={parseInt(page)}
+                    pageSize={parseInt(pageSize)}
+                    changeSelectedPageSize={changeSelectedPageSize}
+                    changeSelectedPage={changeSelectedPage}
+                />
                 <ul className="list bg-base-100 rounded-box shadow-md">
                     {query.data
                         .map(product => (
                             <li key={product.id} className="list-row">
 
-                                <figure className="hover-gallery max-w-48">
-                                    {product.images.length > 1 ?
-                                        product.images.map(image => (
+                                {product.images.length > 1 &&
+                                    <figure className="hover-gallery max-w-48">
+                                        {product.images.map(image => (
                                             <img className="size-48 rounded-box" src={image} alt={product.title}/>
-                                        )) :
-                                        <img className="size-48 rounded-box" src={product.images[0]}
-                                             alt={product.title}/>}
-                                </figure>
+                                        ))}
+                                    </figure>}
+
+                                {product.images.length === 1 &&
+                                    <img className="size-48 rounded-box" src={product.images[0]}
+                                         alt={product.title}/>}
 
                                 <div className={"flex flex-row gap-4"}>
                                     <div className="flex flex-col gap-2 list-col-wrap">
@@ -99,7 +138,14 @@ function ProductsPage() {
                             </li>
                         ))}
                 </ul>
-            </>
+                {/*Pagination*/}
+                <Pagination
+                    page={parseInt(page)}
+                    pageSize={parseInt(pageSize)}
+                    changeSelectedPageSize={changeSelectedPageSize}
+                    changeSelectedPage={changeSelectedPage}
+                />
+            </div>
         )
     }
 
