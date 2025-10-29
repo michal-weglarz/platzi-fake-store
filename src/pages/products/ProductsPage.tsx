@@ -186,8 +186,8 @@ function ProductsPage() {
 	};
 
 	const debounceSearchChange = debounce(onSearchChange, 300);
-	const debounceUpdatePriceMin = debounce(updatePriceMin, 300);
-	const debounceUpdatePriceMax = debounce(updatePriceMax, 300);
+	// const debounceUpdatePriceMin = debounce(updatePriceMin, 300);
+	// const debounceUpdatePriceMax = debounce(updatePriceMax, 300);
 
 	if (isPageLoading) {
 		return (
