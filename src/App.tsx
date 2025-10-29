@@ -7,7 +7,15 @@ import PageLoading from "./components/PageLoading.tsx";
 
 const LoginPage = lazy(() => import('./pages/login/LoginPage.tsx'));
 const ProductsPage = lazy(() => import('./pages/products/ProductsPage.tsx'));
-const queryClient = new QueryClient()
+
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 5 * 60 * 1_000, // 5 min
+        },
+    },
+});
 
 function App() {
     return (
