@@ -57,9 +57,9 @@ function ProductsPage() {
 			};
 		},
 		// for dev
-		staleTime: Infinity,
-		gcTime: Infinity,
-		//gcTime: 10_000, // inactive query gets removed from the cache after 10s
+		// staleTime: Infinity,
+		// gcTime: Infinity,
+		// gcTime: 10_000, // inactive query gets removed from the cache after 10s
 		placeholderData: keepPreviousData,
 	});
 
@@ -229,7 +229,7 @@ function ProductsPage() {
 			<div className={"flex flex-col gap-8 items-end"}>
 				<div className="flex row justify-between w-full items-center">
 					<h1 className="text-4xl font-bold tracking-wide self-start">Products</h1>
-					<Link to={"/products/new"} className={"btn btn-secondary"}>
+					<Link to={"/products/new"} className={"btn btn-neutral"}>
 						<PlusIcon />
 						Add new
 					</Link>

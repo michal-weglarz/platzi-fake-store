@@ -16,7 +16,7 @@ function Navbar() {
 					<Link to={"/products"}>Products</Link>
 				</li>
 				<li>
-					<Link to={"/login"} className={"btn btn-primary"}>
+					<Link to={"/login"} className={"btn"}>
 						Login
 					</Link>
 				</li>
