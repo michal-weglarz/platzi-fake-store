@@ -106,7 +106,7 @@ function ProductsPage() {
                     changeSelectedPageSize={changeSelectedPageSize}
                     changeSelectedPage={changeSelectedPage}
                 />
-                <ul className="list bg-base-100 rounded-box shadow-md">
+                <ul className="list bg-base-100 rounded-box shadow-md w-full">
                     {query.data
                         .map(product => (
                             <li key={product.id} className="list-row">

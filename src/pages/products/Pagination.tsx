@@ -33,7 +33,7 @@ function Pagination(props: Props) {
                         key={index}
                         className={`join-item btn ${index === props.page ? 'btn-active' : ''}`}
                         onClick={() => props.changeSelectedPage(index)}>
-                        {index}
+                        {index + 1}
                     </button>
                 ))}
             </div>
