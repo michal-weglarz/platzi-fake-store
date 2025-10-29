@@ -5,17 +5,12 @@ interface Props {
     pageSize: number;
     changeSelectedPageSize: (event: ChangeEvent<HTMLSelectElement>) => void;
     changeSelectedPage: (page: number) => void;
+    total: number;
 }
 
 
-/**
- * You can access the list of 50 products by using the /products endpoint.
- * See: https://fakeapi.platzi.com/en/rest/products/#_top
- */
-const MAX_NUMBER_OF_ITEMS = 50
-
 function Pagination(props: Props) {
-    const numberOfPages = Math.ceil(MAX_NUMBER_OF_ITEMS / props.pageSize);
+    const numberOfPages = Math.ceil(props.total / props.pageSize);
 
 
     return (

@@ -1,46 +1,33 @@
 import {keepPreviousData, useQuery} from "@tanstack/react-query";
 import {type ChangeEvent} from "react";
 import {useSearchParams} from "wouter";
-import PageLoading from "../../components/PageLoading.tsx";
 import Pagination from "./Pagination.tsx";
-
-interface Category {
-    id: number;
-    name: string;
-    slug: string;
-    image: string;
-    creationAt: string;
-    updatedAt: string;
-};
-
-interface Product {
-    id: number;
-    title: string;
-    slug: string;
-    price: number;
-    description: string;
-    category: Category;
-    images: string[];
-    creationAt: string;
-    updatedAt: string;
-};
-
-const DEFAULT_PAGE_SIZE = 10;
-const DEFAULT_PAGE = 0;
+import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE} from "../../utils/consts.ts";
+import type {Product} from "../../utils/types.ts";
 
 
 function ProductsPage() {
     const [searchParams, setSearchParams] = useSearchParams();
-    const page = searchParams.get('page') ?? DEFAULT_PAGE.toString();
-    const pageSize = searchParams.get('pageSize') ?? DEFAULT_PAGE_SIZE.toString();
+    const page = parseInt(searchParams.get('page') ?? "0") ?? DEFAULT_PAGE;
+    const pageSize = parseInt(searchParams.get('pageSize') ?? "0") ?? DEFAULT_PAGE_SIZE;
 
 
     const query = useQuery({
             queryKey: ['products', page, pageSize],
-            queryFn: async (): Promise<Array<Product>> => {
-                const offset = parseInt(page) * parseInt(pageSize);
-                const response = await fetch(`https://api.escuelajs.co/api/v1/products?offset=${offset}&limit=${pageSize}`);
-                return await response.json()
+            queryFn: async () => {
+                const offset = page * pageSize;
+
+                const [all, paginated] = await Promise.all([
+                    // This call is required for pagination. Ideally the `proucts` endpoint should return total number of all available products.
+                    fetch(`https://api.escuelajs.co/api/v1/products`).then(res => res.json() as Promise<Product[]>),
+                    fetch(`https://api.escuelajs.co/api/v1/products?offset=${offset}&limit=${pageSize}`).then(res => res.json() as Promise<Product[]>),
+                ])
+
+                return {
+                    total: all.length,
+                    products: paginated
+                }
+
             },
             placeholderData: keepPreviousData,
         },
@@ -56,7 +43,7 @@ function ProductsPage() {
     const changeSelectedPageSize = (event: ChangeEvent<HTMLSelectElement>) => {
         const value = event.target.value;
         setSearchParams({
-            // It makes sense to reset the selected page when changing the size to avoid a blank page.
+            // It makes sense to reset the selected page when changing the size to avoid an empty page.
             page: "0",
             pageSize: value,
         })
@@ -96,21 +83,24 @@ function ProductsPage() {
         return 'error';
     }
     if (query.data) {
-
         return (
             <div className={"flex flex-col gap-4 items-end p-4"}>
                 <h1 className="p-4 pb-2 text-3xl font-bold tracking-wide self-start">Products</h1>
                 <Pagination
-                    page={parseInt(page)}
-                    pageSize={parseInt(pageSize)}
+                    page={page}
+                    pageSize={pageSize}
                     changeSelectedPageSize={changeSelectedPageSize}
                     changeSelectedPage={changeSelectedPage}
+                    total={query.data.total}
                 />
                 <ul className="list bg-base-100 rounded-box shadow-md w-full">
-                    {query.data
+                    <li className="p-4 pb-2 text-xs opacity-60 tracking-wide">
+                        {(page) * pageSize + 1}-{Math.min((page + 1) * pageSize, query.data.total)} out
+                        of {query.data.total}
+                    </li>
+                    {query.data.products
                         .map(product => (
                             <li key={product.id} className="list-row">
-
                                 {product.images.length > 1 &&
                                     <figure className="hover-gallery max-w-48">
                                         {product.images.map(image => (
@@ -138,12 +128,12 @@ function ProductsPage() {
                             </li>
                         ))}
                 </ul>
-                {/*Pagination*/}
                 <Pagination
-                    page={parseInt(page)}
-                    pageSize={parseInt(pageSize)}
+                    page={page}
+                    pageSize={pageSize}
                     changeSelectedPageSize={changeSelectedPageSize}
                     changeSelectedPage={changeSelectedPage}
+                    total={query.data.total}
                 />
             </div>
         )
