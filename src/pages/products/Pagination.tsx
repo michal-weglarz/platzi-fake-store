@@ -14,7 +14,7 @@ function Pagination(props: Props) {
 	return (
 		<div className={"flex flex-row gap-2"}>
 			<select
-				className="select"
+				className="select w-fit"
 				value={props.pageSize}
 				onChange={props.changeSelectedPageSize}
 			>

@@ -11,27 +11,35 @@ function ProductsPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageParam = searchParams.get("page");
 	const pageSizeParam = searchParams.get("pageSize");
+	const priceMinParam = searchParams.get("priceMin");
+	const priceMaxParam = searchParams.get("priceMax");
 
 	const page = pageParam ? parseInt(pageParam) : DEFAULT_PAGE;
 	const pageSize = pageSizeParam ? parseInt(pageSizeParam) : DEFAULT_PAGE_SIZE;
 	const sortBy = (searchParams.get("sortBy") ?? DEFAULT_SORT_BY) as SortBy;
 	const title = searchParams.get("title") ?? "";
 	const category = searchParams.get("category") ?? "";
+	const priceMin = priceMinParam ? parseInt(priceMinParam) : 0;
+	const priceMax = priceMaxParam ? parseInt(priceMaxParam) : 0;
 
 	const productsQuery = useQuery({
-		queryKey: ["products", page, pageSize, title, category],
+		queryKey: ["products", page, pageSize, title, category, priceMin, priceMax],
 		queryFn: async () => {
 			const offset = page * pageSize;
 
 			const allSearchParams = new URLSearchParams();
 			allSearchParams.set("title", title);
 			allSearchParams.set("categorySlug", category);
+			allSearchParams.set("price_min", priceMin.toString());
+			allSearchParams.set("price_max", priceMax.toString());
 
 			const paginatedSearchParams = new URLSearchParams();
 			paginatedSearchParams.set("offset", offset.toString());
 			paginatedSearchParams.set("limit", pageSize.toString());
 			paginatedSearchParams.set("title", title);
 			paginatedSearchParams.set("categorySlug", category);
+			paginatedSearchParams.set("price_min", priceMin.toString());
+			paginatedSearchParams.set("price_max", priceMax.toString());
 
 			const [all, paginated] = await Promise.all([
 				// This call is required for pagination. Ideally the `products` endpoint should return total number of all available products.
@@ -75,6 +83,8 @@ function ProductsPage() {
 			sortBy,
 			title,
 			category,
+			priceMin: priceMin.toString(),
+			priceMax: priceMax.toString(),
 		});
 	};
 
@@ -87,6 +97,8 @@ function ProductsPage() {
 			sortBy,
 			title,
 			category,
+			priceMin: priceMin.toString(),
+			priceMax: priceMax.toString(),
 		});
 	};
 
@@ -98,6 +110,8 @@ function ProductsPage() {
 			sortBy: value,
 			title,
 			category,
+			priceMin: priceMin.toString(),
+			priceMax: priceMax.toString(),
 		});
 	};
 
@@ -125,22 +139,54 @@ function ProductsPage() {
 			sortBy: sortBy,
 			title,
 			category: value,
+			priceMin: priceMin.toString(),
+			priceMax: priceMax.toString(),
 		});
 	};
 
 	const onSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const value = event.target.value;
-
 		setSearchParams({
 			page: page.toString(),
 			pageSize: pageSize.toString(),
 			sortBy: sortBy,
 			title: value,
 			category,
+			priceMin: priceMin.toString(),
+			priceMax: priceMax.toString(),
+		});
+	};
+
+	const updatePriceMin = (event: ChangeEvent<HTMLInputElement>) => {
+		const value = event.target.value;
+		console.log("value", value);
+		setSearchParams({
+			page: page.toString(),
+			pageSize: pageSize.toString(),
+			sortBy,
+			title,
+			category,
+			priceMin: value.toString(),
+			priceMax: priceMax.toString(),
+		});
+	};
+
+	const updatePriceMax = (event: ChangeEvent<HTMLInputElement>) => {
+		const value = event.target.value;
+		setSearchParams({
+			page: page.toString(),
+			pageSize: pageSize.toString(),
+			sortBy,
+			title,
+			category,
+			priceMin: priceMin.toString(),
+			priceMax: value.toString(),
 		});
 	};
 
 	const debounceSearchChange = debounce(onSearchChange, 300);
+	const debounceUpdatePriceMin = debounce(updatePriceMin, 300);
+	const debounceUpdatePriceMax = debounce(updatePriceMax, 300);
 
 	if (isPageLoading) {
 		return (
@@ -179,8 +225,8 @@ function ProductsPage() {
 
 	if (productsQuery.data && categoriesQuery.data) {
 		return (
-			<div className={"flex flex-col gap-4 items-end"}>
-				<div className="flex row justify-between w-full items-center mb-12">
+			<div className={"flex flex-col gap-8 items-end"}>
+				<div className="flex row justify-between w-full items-center">
 					<h1 className="text-4xl font-bold tracking-wide self-start">Products</h1>
 					<Link to={"/products/new"} className={"btn btn-secondary"}>
 						<PlusIcon />
@@ -188,37 +234,69 @@ function ProductsPage() {
 					</Link>
 				</div>
 
-				<div className="flex self-start mb-8 gap-2">
-					<label className="input shrink-0">
-						<SearchIcon />
-						<input
-							type="search"
-							placeholder="Search by title"
-							defaultValue={title ?? ""}
-							onChange={debounceSearchChange}
-						/>
-					</label>
+				<div className="flex flex-col self-start w-full">
+					<h3 className={"text-lg font-bold mb"}>Filters</h3>
+					<div className={"flex flex-row gap-4"}>
+						<fieldset className={"fieldset"}>
+							<legend className="fieldset-legend">Title</legend>
+							<label className="input w-[250px]">
+								<SearchIcon />
+								<input
+									type="search"
+									placeholder="Search by title"
+									defaultValue={title ?? ""}
+									onChange={debounceSearchChange}
+								/>
+							</label>
+						</fieldset>
 
-					<select
-						className="select w-[350px]"
-						value={category}
-						onChange={changeSelectedCategory}
-					>
-						<option disabled>Category</option>
-						<option key={"all"} value={""}>
-							All
-						</option>
-						{categoriesQuery.data.map((category) => (
-							<option key={category.id} value={category.slug}>
-								{category.name}
-							</option>
-						))}
-					</select>
+						<fieldset className={"fieldset"}>
+							<legend className="fieldset-legend">Category</legend>
+							<select
+								className="select w-[250px]"
+								value={category}
+								onChange={changeSelectedCategory}
+							>
+								<option disabled>Category</option>
+								<option key={"all"} value={""}>
+									All
+								</option>
+								{categoriesQuery.data.map((category) => (
+									<option key={category.id} value={category.slug}>
+										{category.name}
+									</option>
+								))}
+							</select>
+						</fieldset>
+
+						<fieldset className={"fieldset w-[250px]"}>
+							<legend className="fieldset-legend">Price range</legend>
+							<div className={"flex flex-row gap-2"}>
+								<label className="input">
+									<input
+										type="number"
+										placeholder="Min"
+										value={priceMin}
+										onChange={updatePriceMin}
+									/>
+								</label>
+								<label className="input">
+									<input
+										type="number"
+										placeholder="Max"
+										value={priceMax}
+										onChange={updatePriceMax}
+									/>
+								</label>
+							</div>
+						</fieldset>
+					</div>
+					<div className="divider mb-0"></div>
 				</div>
 
 				{pageSize > 0 && page >= 0 ? (
 					<>
-						<div className="flex row gap-4 w-full justify-between">
+						<div className="flex row gap-4 w-full justify-between items-end">
 							<select className="select" value={sortBy} onChange={setSortBy}>
 								<option disabled>Sort by</option>
 								<option value={"title"}>Title</option>
@@ -226,6 +304,7 @@ function ProductsPage() {
 								<option value={"price-asc"}>Price (asc)</option>
 								<option value={"price-desc"}>Price (desc)</option>
 							</select>
+
 							<Pagination
 								page={page}
 								pageSize={pageSize}
