@@ -14,7 +14,7 @@ function Pagination(props: Props) {
 	return (
 		<div className={"flex flex-row gap-2"}>
 			<select
-				className="select w-fit"
+				className="select select-sm w-fit"
 				value={props.pageSize}
 				onChange={props.changeSelectedPageSize}
 			>
@@ -28,7 +28,7 @@ function Pagination(props: Props) {
 				{new Array(numberOfPages).fill(0).map((_, index) => (
 					<button
 						key={index}
-						className={`join-item btn ${index === props.page ? "btn-active" : ""}`}
+						className={`join-item btn btn-sm ${index === props.page ? "btn-active" : ""}`}
 						onClick={() => props.changeSelectedPage(index)}
 					>
 						{index + 1}

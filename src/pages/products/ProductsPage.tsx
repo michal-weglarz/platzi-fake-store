@@ -11,16 +11,14 @@ function ProductsPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageParam = searchParams.get("page");
 	const pageSizeParam = searchParams.get("pageSize");
-	const priceMinParam = searchParams.get("priceMin");
-	const priceMaxParam = searchParams.get("priceMax");
 
 	const page = pageParam ? parseInt(pageParam) : DEFAULT_PAGE;
 	const pageSize = pageSizeParam ? parseInt(pageSizeParam) : DEFAULT_PAGE_SIZE;
 	const sortBy = (searchParams.get("sortBy") ?? DEFAULT_SORT_BY) as SortBy;
 	const title = searchParams.get("title") ?? "";
 	const category = searchParams.get("category") ?? "";
-	const priceMin = priceMinParam ? parseInt(priceMinParam) : 0;
-	const priceMax = priceMaxParam ? parseInt(priceMaxParam) : 0;
+	const priceMin = searchParams.get("priceMin") ?? "";
+	const priceMax = searchParams.get("priceMax") ?? "";
 
 	const productsQuery = useQuery({
 		queryKey: ["products", page, pageSize, title, category, priceMin, priceMax],
@@ -30,16 +28,16 @@ function ProductsPage() {
 			const allSearchParams = new URLSearchParams();
 			allSearchParams.set("title", title);
 			allSearchParams.set("categorySlug", category);
-			allSearchParams.set("price_min", priceMin.toString());
-			allSearchParams.set("price_max", priceMax.toString());
+			allSearchParams.set("price_min", priceMin);
+			allSearchParams.set("price_max", priceMax);
 
 			const paginatedSearchParams = new URLSearchParams();
 			paginatedSearchParams.set("offset", offset.toString());
 			paginatedSearchParams.set("limit", pageSize.toString());
 			paginatedSearchParams.set("title", title);
 			paginatedSearchParams.set("categorySlug", category);
-			paginatedSearchParams.set("price_min", priceMin.toString());
-			paginatedSearchParams.set("price_max", priceMax.toString());
+			paginatedSearchParams.set("price_min", priceMin);
+			paginatedSearchParams.set("price_max", priceMax);
 
 			const [all, paginated] = await Promise.all([
 				// This call is required for pagination. Ideally the `products` endpoint should return total number of all available products.
@@ -159,20 +157,23 @@ function ProductsPage() {
 
 	const updatePriceMin = (event: ChangeEvent<HTMLInputElement>) => {
 		const value = event.target.value;
-		console.log("value", value);
+		if (parseInt(value) < 0) return;
+
 		setSearchParams({
 			page: page.toString(),
 			pageSize: pageSize.toString(),
 			sortBy,
 			title,
 			category,
-			priceMin: value.toString(),
+			priceMin: value,
 			priceMax: priceMax.toString(),
 		});
 	};
 
 	const updatePriceMax = (event: ChangeEvent<HTMLInputElement>) => {
 		const value = event.target.value;
+		if (parseInt(value) < 0) return;
+
 		setSearchParams({
 			page: page.toString(),
 			pageSize: pageSize.toString(),
@@ -275,6 +276,7 @@ function ProductsPage() {
 								<label className="input">
 									<input
 										type="number"
+										min="0"
 										placeholder="Min"
 										value={priceMin}
 										onChange={updatePriceMin}
@@ -283,6 +285,7 @@ function ProductsPage() {
 								<label className="input">
 									<input
 										type="number"
+										min="0"
 										placeholder="Max"
 										value={priceMax}
 										onChange={updatePriceMax}
@@ -295,10 +298,16 @@ function ProductsPage() {
 				</div>
 
 				{pageSize > 0 && page >= 0 ? (
-					<>
+					<div className={"flex flex-col gap-2 items-end w-full"}>
 						<div className="flex row gap-4 w-full justify-between items-end">
-							<select className="select" value={sortBy} onChange={setSortBy}>
-								<option disabled>Sort by</option>
+							<select
+								className="select select-ghost select-sm w-[150px]"
+								value={sortBy}
+								onChange={setSortBy}
+							>
+								<option value={"default"} disabled>
+									Sort by
+								</option>
 								<option value={"title"}>Title</option>
 								<option value={"category"}>Category</option>
 								<option value={"price-asc"}>Price (asc)</option>
@@ -384,13 +393,15 @@ function ProductsPage() {
 							changeSelectedPage={changeSelectedPage}
 							total={productsQuery.data.total}
 						/>
-					</>
+					</div>
 				) : (
 					<div>Invalid parameters</div>
 				)}
 			</div>
 		);
 	}
+
+	// Default return if no empty.
 	return "empty";
 }
 
