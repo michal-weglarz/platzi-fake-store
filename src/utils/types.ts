@@ -18,3 +18,5 @@ export interface Product {
     creationAt: string;
     updatedAt: string;
 };
+
+export type SortBy = "default" | "title" | "category" | "price-asc" | "price-desc";

@@ -10,14 +10,12 @@ interface Props {
 
 
 function Pagination(props: Props) {
-    const numberOfPages = Math.ceil(props.total / props.pageSize);
-    console.log('numberOfPages', numberOfPages, props);
-
+    const numberOfPages = props.pageSize > 0 ? Math.ceil(props.total / props.pageSize) : 0;
 
     return (
         <div className={'flex flex-row gap-2'}>
             <select className="select" value={props.pageSize} onChange={props.changeSelectedPageSize}>
-                <option disabled selected>Page size</option>
+                <option disabled>Page size</option>
                 <option>5</option>
                 <option>10</option>
                 <option>15</option>
