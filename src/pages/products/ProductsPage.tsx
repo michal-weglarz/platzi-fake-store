@@ -89,7 +89,6 @@ function ProductsPage() {
 	const changeSelectedPageSize = (event: ChangeEvent<HTMLSelectElement>) => {
 		const value = event.target.value;
 		setSearchParams({
-			// It makes sense to reset the selected page when changing the size to avoid an empty page.
 			page: "0",
 			pageSize: value,
 			sortBy,
@@ -132,7 +131,7 @@ function ProductsPage() {
 	const changeSelectedCategory = (event: ChangeEvent<HTMLSelectElement>) => {
 		const value = event.target.value;
 		setSearchParams({
-			page: page.toString(),
+			page: "0",
 			pageSize: pageSize.toString(),
 			sortBy: sortBy,
 			title,
@@ -145,7 +144,7 @@ function ProductsPage() {
 	const onSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const value = event.target.value;
 		setSearchParams({
-			page: page.toString(),
+			page: "0",
 			pageSize: pageSize.toString(),
 			sortBy: sortBy,
 			title: value,
@@ -160,7 +159,7 @@ function ProductsPage() {
 		if (parseInt(value) < 0) return;
 
 		setSearchParams({
-			page: page.toString(),
+			page: "0",
 			pageSize: pageSize.toString(),
 			sortBy,
 			title,
@@ -175,7 +174,7 @@ function ProductsPage() {
 		if (parseInt(value) < 0) return;
 
 		setSearchParams({
-			page: page.toString(),
+			page: "0",
 			pageSize: pageSize.toString(),
 			sortBy,
 			title,
