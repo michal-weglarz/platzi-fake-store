@@ -1,209 +1,271 @@
-import {keepPreviousData, useQuery} from "@tanstack/react-query";
-import {type ChangeEvent} from "react";
-import {Link, useSearchParams} from "wouter";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { type ChangeEvent } from "react";
+import { Link, useSearchParams } from "wouter";
 import Pagination from "./Pagination.tsx";
-import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_BY} from "../../utils/consts.ts";
-import type {Product, SortBy} from "../../utils/types.ts";
-import {PlusIcon} from "../../components/Icons.tsx";
-
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_BY } from "../../utils/consts.ts";
+import type { Product, SortBy } from "../../utils/types.ts";
+import { PlusIcon, SearchIcon } from "../../components/Icons.tsx";
+import { debounce } from "../../utils/utils.ts";
 
 function ProductsPage() {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const pageParam = searchParams.get('page');
-    const pageSizeParam = searchParams.get('pageSize')
+	const [searchParams, setSearchParams] = useSearchParams();
+	const pageParam = searchParams.get("page");
+	const pageSizeParam = searchParams.get("pageSize");
 
-    const page = pageParam ? parseInt(pageParam) : DEFAULT_PAGE;
-    const pageSize = pageSizeParam ? parseInt(pageSizeParam) : DEFAULT_PAGE_SIZE;
-    const sortBy = (searchParams.get('sortBy') ?? DEFAULT_SORT_BY) as SortBy;
+	const page = pageParam ? parseInt(pageParam) : DEFAULT_PAGE;
+	const pageSize = pageSizeParam ? parseInt(pageSizeParam) : DEFAULT_PAGE_SIZE;
+	const sortBy = (searchParams.get("sortBy") ?? DEFAULT_SORT_BY) as SortBy;
+	const title = searchParams.get("title") ?? "";
 
+	const query = useQuery({
+		queryKey: ["products", page, pageSize, title],
+		queryFn: async () => {
+			const offset = page * pageSize;
 
-    const query = useQuery({
-            queryKey: ['products', page, pageSize],
-            queryFn: async () => {
-                const offset = page * pageSize;
-                const [all, paginated] = await Promise.all([
-                    // This call is required for pagination. Ideally the `products` endpoint should return total number of all available products.
-                    fetch(`https://api.escuelajs.co/api/v1/products`).then(res => res.json() as Promise<Product[]>),
-                    fetch(`https://api.escuelajs.co/api/v1/products?offset=${offset}&limit=${pageSize}`).then(res => res.json() as Promise<Product[]>),
-                ])
+			const allSearchParams = new URLSearchParams();
+			allSearchParams.set("title", title ?? "");
 
-                return {
-                    total: all.length,
-                    products: paginated
-                }
+			const paginatedSearchParams = new URLSearchParams();
+			paginatedSearchParams.set("offset", offset.toString());
+			paginatedSearchParams.set("limit", pageSize.toString());
+			paginatedSearchParams.set("title", title ?? "");
 
-            },
-            // for dev
-            staleTime: Infinity,
-            gcTime: Infinity,
-            //gcTime: 10_000, // inactive query gets removed from the cache after 10s
-            placeholderData: keepPreviousData,
-        },
-    )
+			const [all, paginated] = await Promise.all([
+				// This call is required for pagination. Ideally the `products` endpoint should return total number of all available products.
+				fetch(`https://api.escuelajs.co/api/v1/products?${allSearchParams}`).then(
+					(res) => res.json() as Promise<Product[]>
+				),
+				fetch(`https://api.escuelajs.co/api/v1/products?${paginatedSearchParams}`).then(
+					(res) => res.json() as Promise<Product[]>
+				),
+			]);
 
-    const changeSelectedPage = (page: number) => {
-        setSearchParams({
-            page: page.toString(),
-            pageSize: pageSize.toString(),
-            sortBy
-        })
-    }
+			console.log("in query: ", all, paginated);
 
-    const changeSelectedPageSize = (event: ChangeEvent<HTMLSelectElement>) => {
-        const value = event.target.value;
-        setSearchParams({
-            // It makes sense to reset the selected page when changing the size to avoid an empty page.
-            page: "0",
-            pageSize: value,
-            sortBy
+			return {
+				total: all.length,
+				products: paginated,
+			};
+		},
+		// for dev
+		staleTime: Infinity,
+		gcTime: Infinity,
+		//gcTime: 10_000, // inactive query gets removed from the cache after 10s
+		placeholderData: keepPreviousData,
+	});
 
-        })
-    }
+	const changeSelectedPage = (page: number) => {
+		setSearchParams({
+			page: page.toString(),
+			pageSize: pageSize.toString(),
+			sortBy,
+			title,
+		});
+	};
 
-    const setSortBy = (event: ChangeEvent<HTMLSelectElement>) => {
-        const value = event.target.value;
-        setSearchParams({
-            page: page.toString(),
-            pageSize: pageSize.toString(),
-            sortBy: value
-        })
-    }
+	const changeSelectedPageSize = (event: ChangeEvent<HTMLSelectElement>) => {
+		const value = event.target.value;
+		setSearchParams({
+			// It makes sense to reset the selected page when changing the size to avoid an empty page.
+			page: "0",
+			pageSize: value,
+			sortBy,
+			title,
+		});
+	};
 
-    const sortProducts = (a: Product, b: Product) => {
-        if (sortBy === 'title') {
-            return a.title.localeCompare(b.title);
-        }
-        if (sortBy === 'category') {
-            return a.category.name.localeCompare(b.category.name);
-        }
-        if (sortBy === 'price-asc') {
-            return a.price - b.price
-        }
-        if (sortBy === 'price-desc') {
-            return b.price - a.price
-        }
-        return 0;
-    }
+	const setSortBy = (event: ChangeEvent<HTMLSelectElement>) => {
+		const value = event.target.value;
+		setSearchParams({
+			page: page.toString(),
+			pageSize: pageSize.toString(),
+			sortBy: value,
+			title,
+		});
+	};
 
+	const sortProducts = (a: Product, b: Product) => {
+		if (sortBy === "title") {
+			return a.title.localeCompare(b.title);
+		}
+		if (sortBy === "category") {
+			return a.category.name.localeCompare(b.category.name);
+		}
+		if (sortBy === "price-asc") {
+			return a.price - b.price;
+		}
+		if (sortBy === "price-desc") {
+			return b.price - a.price;
+		}
+		return 0;
+	};
 
-    if (query.isLoading) {
-        return (
-            <>
-                <h1 className="p-4 pb-2 text-3xl font-bold tracking-wide">Products</h1>
-                <ul className="list bg-base-100 rounded-box shadow-md">
-                    <li className="list-row">
-                        <div className="skeleton h-48 w-48"></div>
-                        <div className={"flex flex-col gap-4"}>
-                            <div className="skeleton h-4 w-64"></div>
-                            <div className="skeleton h-8 w-full"></div>
-                        </div>
-                    </li>
-                    <li className="list-row">
-                        <div className="skeleton h-48 w-48"></div>
-                        <div className={"flex flex-col gap-4"}>
-                            <div className="skeleton h-4 w-64"></div>
-                            <div className="skeleton h-8 w-full"></div>
-                        </div>
-                    </li>
-                    <li className="list-row">
-                        <div className="skeleton h-48 w-48"></div>
-                        <div className={"flex flex-col gap-4"}>
-                            <div className="skeleton h-4 w-64"></div>
-                            <div className="skeleton h-8 w-full"></div>
-                        </div>
-                    </li>
-                </ul>
-            </>
-        )
-    }
-    if (query.error) {
-        return 'error';
-    }
-    if (query.data) {
-        return (
-            <div className={"flex flex-col gap-4 items-end p-4"}>
-                <div className="flex row justify-between w-full items-center mb-12">
-                    <h1 className="p-4 pb-2 text-3xl font-bold tracking-wide self-start">Products</h1>
-                    <Link to={"/products/new"} className={"btn btn-secondary"}>
-                        <PlusIcon/>
-                        Add new
-                    </Link>
-                </div>
+	const onSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+		const value = event.target.value;
 
-                {pageSize > 0 && page >= 0 ?
-                    <>
-                        <div className="flex row gap-4 w-full justify-between">
-                            <select className="select" value={sortBy} onChange={setSortBy}>
-                                <option disabled>Sort by</option>
-                                <option value={"title"}>Title</option>
-                                <option value={'category'}>Category</option>
-                                <option value={"price-asc"}>Price (asc)</option>
-                                <option value={"price-desc"}>Price (desc)</option>
-                            </select>
-                            <Pagination
-                                page={page}
-                                pageSize={pageSize}
-                                changeSelectedPageSize={changeSelectedPageSize}
-                                changeSelectedPage={changeSelectedPage}
-                                total={query.data.total}
-                            />
-                        </div>
-                        <ul className="list bg-base-100 rounded-box shadow-md w-full">
-                            <li className="p-4 pb-2 text-xs opacity-60 tracking-wide">
-                                {(page) * pageSize + 1}-{Math.min((page + 1) * pageSize, query.data.total)} out
-                                of {query.data.total}
-                            </li>
-                            {query.data.products
-                                .sort(sortProducts)
-                                .map(product => (
-                                    <li key={product.id} className="list-row">
-                                        {product.images.length > 1 &&
-                                            <figure className="hover-gallery max-w-48">
-                                                {product.images.map(image => (
-                                                    <img key={image} className="size-48 rounded-box" src={image}
-                                                         alt={product.title}/>
-                                                ))}
-                                            </figure>}
+		setSearchParams({
+			page: page.toString(),
+			pageSize: pageSize.toString(),
+			sortBy: sortBy,
+			title: value,
+		});
+	};
 
-                                        {product.images.length === 1 &&
-                                            // `object` provides a fallback image
-                                            <object data="https://placehold.co/200x200.png"
-                                                    type="image/png" className="size-48 rounded-box">
-                                                <img className="size-48 rounded-box" src={product.images[0]}
-                                                     alt={product.title}/>
-                                            </object>
-                                        }
+	const debounceSearchChange = debounce(onSearchChange, 300);
 
-                                        <div className={"flex flex-row gap-4"}>
-                                            <div className="flex flex-col gap-2 list-col-wrap w-full tracking-wide">
-                                                <p className="text-xl">{product.title}</p>
-                                                <div className="text-xs uppercase font-semibold opacity-60">
-                                                    {product.category.name}
-                                                </div>
-                                                <p className="text-xs opacity-60">
-                                                    {product.description}
-                                                </p>
-                                            </div>
-                                            <div
-                                                className={"flex w-fit min-w-16 font-semibold text-lg"}>${product.price}</div>
-                                        </div>
-                                    </li>
-                                ))}
-                        </ul>
-                        <Pagination
-                            page={page}
-                            pageSize={pageSize}
-                            changeSelectedPageSize={changeSelectedPageSize}
-                            changeSelectedPage={changeSelectedPage}
-                            total={query.data.total}
-                        />
-                    </>
-                    : <div>Invalid parameters</div>
-                }
-            </div>
-        )
-    }
-    return 'empty'
+	if (query.isLoading) {
+		return (
+			<>
+				<h1 className="p-4 pb-2 text-3xl font-bold tracking-wide">Products</h1>
+				<ul className="list bg-base-100 rounded-box shadow-md">
+					<li className="list-row">
+						<div className="skeleton h-48 w-48"></div>
+						<div className={"flex flex-col gap-4"}>
+							<div className="skeleton h-4 w-64"></div>
+							<div className="skeleton h-8 w-full"></div>
+						</div>
+					</li>
+					<li className="list-row">
+						<div className="skeleton h-48 w-48"></div>
+						<div className={"flex flex-col gap-4"}>
+							<div className="skeleton h-4 w-64"></div>
+							<div className="skeleton h-8 w-full"></div>
+						</div>
+					</li>
+					<li className="list-row">
+						<div className="skeleton h-48 w-48"></div>
+						<div className={"flex flex-col gap-4"}>
+							<div className="skeleton h-4 w-64"></div>
+							<div className="skeleton h-8 w-full"></div>
+						</div>
+					</li>
+				</ul>
+			</>
+		);
+	}
+	if (query.error) {
+		return "error";
+	}
+
+	if (query.data) {
+		return (
+			<div className={"flex flex-col gap-4 items-end"}>
+				<div className="flex row justify-between w-full items-center mb-12">
+					<h1 className="text-4xl font-bold tracking-wide self-start">Products</h1>
+					<Link to={"/products/new"} className={"btn btn-secondary"}>
+						<PlusIcon />
+						Add new
+					</Link>
+				</div>
+
+				<div className="flex self-start mb-8">
+					<label className="input">
+						<SearchIcon />
+						<input
+							type="search"
+							placeholder="Search by title"
+							defaultValue={title ?? ""}
+							onChange={debounceSearchChange}
+						/>
+					</label>
+				</div>
+
+				{pageSize > 0 && page >= 0 ? (
+					<>
+						<div className="flex row gap-4 w-full justify-between">
+							<select className="select" value={sortBy} onChange={setSortBy}>
+								<option disabled>Sort by</option>
+								<option value={"title"}>Title</option>
+								<option value={"category"}>Category</option>
+								<option value={"price-asc"}>Price (asc)</option>
+								<option value={"price-desc"}>Price (desc)</option>
+							</select>
+							<Pagination
+								page={page}
+								pageSize={pageSize}
+								changeSelectedPageSize={changeSelectedPageSize}
+								changeSelectedPage={changeSelectedPage}
+								total={query.data.total}
+							/>
+						</div>
+
+						<ul className="list bg-base-100 rounded-box shadow-md w-full">
+							<li className="p-4 pb-2 text-xs opacity-60 tracking-wide">
+								{page * pageSize + 1}-
+								{Math.min((page + 1) * pageSize, query.data.total)} out of{" "}
+								{query.data.total}
+							</li>
+							{query.data.total === 0 ? (
+								<li className={"list-row"}>No results</li>
+							) : (
+								query.data.products.sort(sortProducts).map((product) => (
+									<li key={product.id} className="list-row">
+										{product.images.length > 1 && (
+											<figure className="hover-gallery max-w-48">
+												{product.images.map((image) => (
+													<img
+														key={image}
+														className="size-48 rounded-box"
+														src={image}
+														alt={product.title}
+													/>
+												))}
+											</figure>
+										)}
+
+										{product.images.length === 1 && (
+											// `object` provides a fallback image
+											<object
+												data="https://placehold.co/200x200.png"
+												type="image/png"
+												className="size-48 rounded-box"
+											>
+												<img
+													className="size-48 rounded-box"
+													src={product.images[0]}
+													alt={product.title}
+												/>
+											</object>
+										)}
+
+										<div className={"flex flex-row gap-4"}>
+											<div className="flex flex-col gap-2 list-col-wrap w-full tracking-wide">
+												<p className="text-xl">{product.title}</p>
+												<div className="text-xs uppercase font-semibold opacity-60">
+													{product.category.name}
+												</div>
+												<p className="text-xs opacity-60">
+													{product.description}
+												</p>
+											</div>
+											<div
+												className={
+													"flex w-fit min-w-16 font-semibold text-lg list-col-grow"
+												}
+											>
+												${product.price}
+											</div>
+										</div>
+									</li>
+								))
+							)}
+						</ul>
+
+						<Pagination
+							page={page}
+							pageSize={pageSize}
+							changeSelectedPageSize={changeSelectedPageSize}
+							changeSelectedPage={changeSelectedPage}
+							total={query.data.total}
+						/>
+					</>
+				) : (
+					<div>Invalid parameters</div>
+				)}
+			</div>
+		);
+	}
+	return "empty";
 }
 
 export default ProductsPage;
