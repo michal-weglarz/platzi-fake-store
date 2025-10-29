@@ -1,6 +1,6 @@
 import {keepPreviousData, useQuery} from "@tanstack/react-query";
 import {type ChangeEvent} from "react";
-import {useSearchParams} from "wouter";
+import {Link, useSearchParams} from "wouter";
 import Pagination from "./Pagination.tsx";
 import {DEFAULT_PAGE, DEFAULT_PAGE_SIZE} from "../../utils/consts.ts";
 import type {Product} from "../../utils/types.ts";
@@ -8,15 +8,17 @@ import type {Product} from "../../utils/types.ts";
 
 function ProductsPage() {
     const [searchParams, setSearchParams] = useSearchParams();
-    const page = parseInt(searchParams.get('page') ?? "0") ?? DEFAULT_PAGE;
-    const pageSize = parseInt(searchParams.get('pageSize') ?? "0") ?? DEFAULT_PAGE_SIZE;
+    const pageParam = searchParams.get('page');
+    const pageSizeParam = searchParams.get('pageSize')
+
+    const page = pageParam ? parseInt(pageParam) : DEFAULT_PAGE;
+    const pageSize = (pageSizeParam ? parseInt(pageSizeParam) : DEFAULT_PAGE_SIZE);
 
 
     const query = useQuery({
             queryKey: ['products', page, pageSize],
             queryFn: async () => {
                 const offset = page * pageSize;
-
                 const [all, paginated] = await Promise.all([
                     // This call is required for pagination. Ideally the `proucts` endpoint should return total number of all available products.
                     fetch(`https://api.escuelajs.co/api/v1/products`).then(res => res.json() as Promise<Product[]>),
@@ -85,62 +87,76 @@ function ProductsPage() {
     if (query.data) {
         return (
             <div className={"flex flex-col gap-4 items-end p-4"}>
-                <h1 className="p-4 pb-2 text-3xl font-bold tracking-wide self-start">Products</h1>
-                <Pagination
-                    page={page}
-                    pageSize={pageSize}
-                    changeSelectedPageSize={changeSelectedPageSize}
-                    changeSelectedPage={changeSelectedPage}
-                    total={query.data.total}
-                />
-                <ul className="list bg-base-100 rounded-box shadow-md w-full">
-                    <li className="p-4 pb-2 text-xs opacity-60 tracking-wide">
-                        {(page) * pageSize + 1}-{Math.min((page + 1) * pageSize, query.data.total)} out
-                        of {query.data.total}
-                    </li>
-                    {query.data.products
-                        .map(product => (
-                            <li key={product.id} className="list-row">
-                                {product.images.length > 1 &&
-                                    <figure className="hover-gallery max-w-48">
-                                        {product.images.map(image => (
-                                            <img className="size-48 rounded-box" src={image} alt={product.title}/>
-                                        ))}
-                                    </figure>}
+                <div className="flex row justify-between w-full items-center mb-12">
+                    <h1 className="p-4 pb-2 text-3xl font-bold tracking-wide self-start">Products</h1>
+                    <Link to={"/products/new"} className={"btn btn-secondary"}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor" className="size-[1.2em]">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                        </svg>
+                        Add new
+                    </Link>
+                </div>
 
-                                {product.images.length === 1 &&
-                                    <img className="size-48 rounded-box" src={product.images[0]}
-                                         alt={product.title}/>}
-
-                                <div className={"flex flex-row gap-4"}>
-                                    <div className="flex flex-col gap-2 list-col-wrap">
-                                        <p className="text-xl">{product.title}</p>
-                                        <div className="text-xs uppercase font-semibold opacity-60">
-                                            {product.category.name}
-                                        </div>
-                                        <p className="text-xs opacity-60">
-                                            {product.description}
-                                        </p>
-                                    </div>
-                                    <div
-                                        className={"flex w-fit min-w-16 font-semibold text-lg"}>${product.price}</div>
-                                </div>
+                {pageSize > 0 && page >= 0 ?
+                    <>
+                        <Pagination
+                            page={page}
+                            pageSize={pageSize}
+                            changeSelectedPageSize={changeSelectedPageSize}
+                            changeSelectedPage={changeSelectedPage}
+                            total={query.data.total}
+                        />
+                        <ul className="list bg-base-100 rounded-box shadow-md w-full">
+                            <li className="p-4 pb-2 text-xs opacity-60 tracking-wide">
+                                {(page) * pageSize + 1}-{Math.min((page + 1) * pageSize, query.data.total)} out
+                                of {query.data.total}
                             </li>
-                        ))}
-                </ul>
-                <Pagination
-                    page={page}
-                    pageSize={pageSize}
-                    changeSelectedPageSize={changeSelectedPageSize}
-                    changeSelectedPage={changeSelectedPage}
-                    total={query.data.total}
-                />
+                            {query.data.products
+                                .map(product => (
+                                    <li key={product.id} className="list-row">
+                                        {product.images.length > 1 &&
+                                            <figure className="hover-gallery max-w-48">
+                                                {product.images.map(image => (
+                                                    <img className="size-48 rounded-box" src={image}
+                                                         alt={product.title}/>
+                                                ))}
+                                            </figure>}
+
+                                        {product.images.length === 1 &&
+                                            <img className="size-48 rounded-box" src={product.images[0]}
+                                                 alt={product.title}/>}
+
+                                        <div className={"flex flex-row gap-4"}>
+                                            <div className="flex flex-col gap-2 list-col-wrap">
+                                                <p className="text-xl">{product.title}</p>
+                                                <div className="text-xs uppercase font-semibold opacity-60">
+                                                    {product.category.name}
+                                                </div>
+                                                <p className="text-xs opacity-60">
+                                                    {product.description}
+                                                </p>
+                                            </div>
+                                            <div
+                                                className={"flex w-fit min-w-16 font-semibold text-lg"}>${product.price}</div>
+                                        </div>
+                                    </li>
+                                ))}
+                        </ul>
+                        <Pagination
+                            page={page}
+                            pageSize={pageSize}
+                            changeSelectedPageSize={changeSelectedPageSize}
+                            changeSelectedPage={changeSelectedPage}
+                            total={query.data.total}
+                        />
+                    </>
+                    : <div>Invalid parameters</div>
+                }
             </div>
         )
     }
-
-
-    return null
+    return 'empty'
 }
 
 export default ProductsPage;

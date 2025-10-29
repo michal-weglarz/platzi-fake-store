@@ -11,6 +11,7 @@ interface Props {
 
 function Pagination(props: Props) {
     const numberOfPages = Math.ceil(props.total / props.pageSize);
+    console.log('numberOfPages', numberOfPages, props);
 
 
     return (

@@ -7,7 +7,7 @@ import PageLoading from "./components/PageLoading.tsx";
 
 const LoginPage = lazy(() => import('./pages/login/LoginPage.tsx'));
 const ProductsPage = lazy(() => import('./pages/products/ProductsPage.tsx'));
-
+const AddNewProductPage = lazy(() => import('./pages/products/AddNewProductPage.tsx'));
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -31,6 +31,11 @@ function App() {
                     <Route path="/products">
                         <Suspense fallback={<PageLoading/>}>
                             <ProductsPage/>
+                        </Suspense>
+                    </Route>
+                    <Route path="/products/new">
+                        <Suspense fallback={<PageLoading/>}>
+                            <AddNewProductPage/>
                         </Suspense>
                     </Route>
                     <Route path="/products/new"/>
