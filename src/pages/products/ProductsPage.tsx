@@ -3,7 +3,7 @@ import { type ChangeEvent } from "react";
 import { Link, useSearchParams } from "wouter";
 import Pagination from "./Pagination.tsx";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_BY } from "../../utils/consts.ts";
-import type { Product, SortBy } from "../../utils/types.ts";
+import type { Category, Product, SortBy } from "../../utils/types.ts";
 import { PlusIcon, SearchIcon } from "../../components/Icons.tsx";
 import { debounce } from "../../utils/utils.ts";
 
@@ -16,19 +16,22 @@ function ProductsPage() {
 	const pageSize = pageSizeParam ? parseInt(pageSizeParam) : DEFAULT_PAGE_SIZE;
 	const sortBy = (searchParams.get("sortBy") ?? DEFAULT_SORT_BY) as SortBy;
 	const title = searchParams.get("title") ?? "";
+	const category = searchParams.get("category") ?? "";
 
-	const query = useQuery({
-		queryKey: ["products", page, pageSize, title],
+	const productsQuery = useQuery({
+		queryKey: ["products", page, pageSize, title, category],
 		queryFn: async () => {
 			const offset = page * pageSize;
 
 			const allSearchParams = new URLSearchParams();
-			allSearchParams.set("title", title ?? "");
+			allSearchParams.set("title", title);
+			allSearchParams.set("categorySlug", category);
 
 			const paginatedSearchParams = new URLSearchParams();
 			paginatedSearchParams.set("offset", offset.toString());
 			paginatedSearchParams.set("limit", pageSize.toString());
-			paginatedSearchParams.set("title", title ?? "");
+			paginatedSearchParams.set("title", title);
+			paginatedSearchParams.set("categorySlug", category);
 
 			const [all, paginated] = await Promise.all([
 				// This call is required for pagination. Ideally the `products` endpoint should return total number of all available products.
@@ -54,12 +57,24 @@ function ProductsPage() {
 		placeholderData: keepPreviousData,
 	});
 
+	const categoriesQuery = useQuery({
+		queryKey: ["categories"],
+		queryFn: async (): Promise<Category[]> => {
+			const response = await fetch(`https://api.escuelajs.co/api/v1/categories`);
+			return response.json();
+		},
+	});
+
+	const isPageLoading = productsQuery.isLoading || categoriesQuery.isLoading;
+	const isPageError = productsQuery.isError || categoriesQuery.isError;
+
 	const changeSelectedPage = (page: number) => {
 		setSearchParams({
 			page: page.toString(),
 			pageSize: pageSize.toString(),
 			sortBy,
 			title,
+			category,
 		});
 	};
 
@@ -71,6 +86,7 @@ function ProductsPage() {
 			pageSize: value,
 			sortBy,
 			title,
+			category,
 		});
 	};
 
@@ -81,6 +97,7 @@ function ProductsPage() {
 			pageSize: pageSize.toString(),
 			sortBy: value,
 			title,
+			category,
 		});
 	};
 
@@ -100,6 +117,17 @@ function ProductsPage() {
 		return 0;
 	};
 
+	const changeSelectedCategory = (event: ChangeEvent<HTMLSelectElement>) => {
+		const value = event.target.value;
+		setSearchParams({
+			page: page.toString(),
+			pageSize: pageSize.toString(),
+			sortBy: sortBy,
+			title,
+			category: value,
+		});
+	};
+
 	const onSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const value = event.target.value;
 
@@ -108,12 +136,13 @@ function ProductsPage() {
 			pageSize: pageSize.toString(),
 			sortBy: sortBy,
 			title: value,
+			category,
 		});
 	};
 
 	const debounceSearchChange = debounce(onSearchChange, 300);
 
-	if (query.isLoading) {
+	if (isPageLoading) {
 		return (
 			<>
 				<h1 className="p-4 pb-2 text-3xl font-bold tracking-wide">Products</h1>
@@ -143,11 +172,12 @@ function ProductsPage() {
 			</>
 		);
 	}
-	if (query.error) {
+
+	if (isPageError) {
 		return "error";
 	}
 
-	if (query.data) {
+	if (productsQuery.data && categoriesQuery.data) {
 		return (
 			<div className={"flex flex-col gap-4 items-end"}>
 				<div className="flex row justify-between w-full items-center mb-12">
@@ -158,8 +188,8 @@ function ProductsPage() {
 					</Link>
 				</div>
 
-				<div className="flex self-start mb-8">
-					<label className="input">
+				<div className="flex self-start mb-8 gap-2">
+					<label className="input shrink-0">
 						<SearchIcon />
 						<input
 							type="search"
@@ -168,6 +198,22 @@ function ProductsPage() {
 							onChange={debounceSearchChange}
 						/>
 					</label>
+
+					<select
+						className="select w-[350px]"
+						value={category}
+						onChange={changeSelectedCategory}
+					>
+						<option disabled>Category</option>
+						<option key={"all"} value={""}>
+							All
+						</option>
+						{categoriesQuery.data.map((category) => (
+							<option key={category.id} value={category.slug}>
+								{category.name}
+							</option>
+						))}
+					</select>
 				</div>
 
 				{pageSize > 0 && page >= 0 ? (
@@ -185,20 +231,21 @@ function ProductsPage() {
 								pageSize={pageSize}
 								changeSelectedPageSize={changeSelectedPageSize}
 								changeSelectedPage={changeSelectedPage}
-								total={query.data.total}
+								total={productsQuery.data.total}
 							/>
 						</div>
 
 						<ul className="list bg-base-100 rounded-box shadow-md w-full">
 							<li className="p-4 pb-2 text-xs opacity-60 tracking-wide">
 								{page * pageSize + 1}-
-								{Math.min((page + 1) * pageSize, query.data.total)} out of{" "}
-								{query.data.total}
+								{Math.min((page + 1) * pageSize, productsQuery.data.total)} out of{" "}
+								{productsQuery.data.total}
 							</li>
-							{query.data.total === 0 ? (
+
+							{productsQuery.data.total === 0 ? (
 								<li className={"list-row"}>No results</li>
 							) : (
-								query.data.products.sort(sortProducts).map((product) => (
+								productsQuery.data.products.sort(sortProducts).map((product) => (
 									<li key={product.id} className="list-row">
 										{product.images.length > 1 && (
 											<figure className="hover-gallery max-w-48">
@@ -256,7 +303,7 @@ function ProductsPage() {
 							pageSize={pageSize}
 							changeSelectedPageSize={changeSelectedPageSize}
 							changeSelectedPage={changeSelectedPage}
-							total={query.data.total}
+							total={productsQuery.data.total}
 						/>
 					</>
 				) : (
