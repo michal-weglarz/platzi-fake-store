@@ -6,6 +6,7 @@ import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_BY } from "../../utils/co
 import type { Category, Product, SortBy } from "../../utils/types.ts";
 import { PlusIcon, SearchIcon } from "../../components/Icons.tsx";
 import { debounce } from "../../utils/utils.ts";
+import api from "../../utils/api.ts";
 
 function ProductsPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -25,31 +26,24 @@ function ProductsPage() {
 		queryFn: async () => {
 			const offset = page * pageSize;
 
-			const allSearchParams = new URLSearchParams();
-			allSearchParams.set("title", title);
-			allSearchParams.set("categorySlug", category);
-			allSearchParams.set("price_min", priceMin);
-			allSearchParams.set("price_max", priceMax);
-
-			const paginatedSearchParams = new URLSearchParams();
-			paginatedSearchParams.set("offset", offset.toString());
-			paginatedSearchParams.set("limit", pageSize.toString());
-			paginatedSearchParams.set("title", title);
-			paginatedSearchParams.set("categorySlug", category);
-			paginatedSearchParams.set("price_min", priceMin);
-			paginatedSearchParams.set("price_max", priceMax);
-
 			const [all, paginated] = await Promise.all([
-				// This call is required for pagination. Ideally the `products` endpoint should return total number of all available products.
-				fetch(`https://api.escuelajs.co/api/v1/products?${allSearchParams}`).then(
-					(res) => res.json() as Promise<Product[]>
-				),
-				fetch(`https://api.escuelajs.co/api/v1/products?${paginatedSearchParams}`).then(
-					(res) => res.json() as Promise<Product[]>
-				),
+				// All products for total count
+				api.products.getAll({
+					title,
+					categorySlug: category,
+					price_min: priceMin,
+					price_max: priceMax,
+				}),
+				// Paginated products
+				api.products.getAll({
+					offset,
+					limit: pageSize,
+					title,
+					categorySlug: category,
+					price_min: priceMin,
+					price_max: priceMax,
+				}),
 			]);
-
-			console.log("in query: ", all, paginated);
 
 			return {
 				total: all.length,
