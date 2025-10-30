@@ -6,6 +6,7 @@ import { lazy, Suspense } from "react";
 import PageLoading from "./components/PageLoading.tsx";
 import { AuthProvider } from "./utils/AuthContext.tsx";
 import { ToastContainer } from "react-toastify";
+import ProtectedRoute from "./utils/ProtectedRoute.tsx";
 
 const LoginPage = lazy(() => import("./pages/login/LoginPage.tsx"));
 const ProductsPage = lazy(() => import("./pages/products/ProductsPage.tsx"));
@@ -38,7 +39,9 @@ function App() {
 						</Route>
 						<Route path="/products/new">
 							<Suspense fallback={<PageLoading />}>
-								<AddNewProductPage />
+								<ProtectedRoute>
+									<AddNewProductPage />
+								</ProtectedRoute>
 							</Suspense>
 						</Route>
 						<Route path="/products/new" />

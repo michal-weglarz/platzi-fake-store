@@ -50,7 +50,7 @@ function AddNewProductPage() {
 		<div className={"flex flex-col gap-8 items-end"}>
 			<div className="flex row justify-between w-full items-center">
 				<div className={"flex flex-row gap-2 items-center"}>
-					<Link to={"/products"} className={"btn btn-ghost btn-sm"}>
+					<Link to={"/products"} className={"btn btn-ghost btn-square"}>
 						<BackArrowIcon />
 					</Link>
 
