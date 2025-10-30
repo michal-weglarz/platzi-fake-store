@@ -1,6 +1,12 @@
 import { Link } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
+import api from "../utils/api.ts";
+import { useAuth } from "../utils/useAuth.ts";
 
 function Navbar() {
+	const queryClient = useQueryClient();
+	const auth = useAuth();
+
 	return (
 		<nav className="navbar bg-base-100 shadow-sm fixed z-2 top-0">
 			<div className="flex-1">
@@ -12,12 +18,41 @@ function Navbar() {
 				<li>
 					<Link to={"/products"}>Products</Link>
 				</li>
-				<li>
-					<Link to={"/login"} className={"btn"}>
-						Login
-					</Link>
-				</li>
 			</ul>
+
+			{auth.user == null ? (
+				<Link to={"/login"} className={"btn"}>
+					Login
+				</Link>
+			) : (
+				<div className="dropdown dropdown-end">
+					<div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+						<div className="w-10 rounded-full">
+							<img
+								alt="Tailwind CSS Navbar component"
+								src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+							/>
+						</div>
+					</div>
+					<ul
+						tabIndex={-1}
+						className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
+					>
+						<li>
+							<a>Profile</a>
+						</li>
+						<li>
+							<button
+								onClick={() => {
+									api.auth.logout(queryClient);
+								}}
+							>
+								Logout
+							</button>
+						</li>
+					</ul>
+				</div>
+			)}
 		</nav>
 	);
 }

@@ -3,12 +3,14 @@ import { type ChangeEvent } from "react";
 import { Link, useSearchParams } from "wouter";
 import Pagination from "./Pagination.tsx";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_BY } from "../../utils/consts.ts";
-import type { Category, Product, SortBy } from "../../utils/types.ts";
+import type { Product, SortBy } from "../../utils/types.ts";
 import { PlusIcon, SearchIcon } from "../../components/Icons.tsx";
 import { debounce } from "../../utils/utils.ts";
 import api from "../../utils/api.ts";
+import { useAuth } from "../../utils/useAuth.ts";
 
 function ProductsPage() {
+	const auth = useAuth();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const pageParam = searchParams.get("page");
 	const pageSizeParam = searchParams.get("pageSize");
@@ -59,7 +61,7 @@ function ProductsPage() {
 
 	const categoriesQuery = useQuery({
 		queryKey: ["categories"],
-		queryFn: async (): Promise<Category[]> => {
+		queryFn: async () => {
 			return api.categories.getAll();
 		},
 	});
@@ -193,10 +195,12 @@ function ProductsPage() {
 			<div className={"flex flex-col gap-8 items-end"}>
 				<div className="flex row justify-between w-full items-center">
 					<h1 className="text-4xl font-bold tracking-wide self-start">Products</h1>
-					<Link to={"/products/new"} className={"btn btn-neutral"}>
-						<PlusIcon />
-						Add new
-					</Link>
+					{auth.user != null && (
+						<Link to={"/products/new"} className={"btn btn-neutral"}>
+							<PlusIcon />
+							Add new
+						</Link>
+					)}
 				</div>
 
 				<div className="flex flex-col self-start w-full">

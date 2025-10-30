@@ -24,11 +24,10 @@ export type SortBy = "default" | "title" | "category" | "price-asc" | "price-des
 export interface User {
 	id: number;
 	email: string;
+	password: string;
 	name: string;
 	role: string;
 	avatar: string;
-	creationAt: string;
-	updatedAt: string;
 }
 
 export interface ProductsQueryParams {
@@ -61,20 +60,11 @@ export interface LoginCredentials {
 	password: string;
 }
 
-export interface RegisterData {
-	email: string;
-	password: string;
-	name: string;
-	avatar?: string;
-}
-
 export interface AuthResponse {
 	access_token: string;
 	refresh_token: string;
 }
 
-export interface UpdateUserData {
-	email?: string;
-	name?: string;
-	avatar?: string;
+export interface AuthContextType {
+	user?: User | null;
 }

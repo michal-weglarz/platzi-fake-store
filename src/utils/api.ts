@@ -6,10 +6,10 @@ import type {
 	LoginCredentials,
 	Product,
 	ProductsQueryParams,
-	RegisterData,
 	UpdateProductData,
 	User,
 } from "./types.ts";
+import type { QueryClient } from "@tanstack/react-query";
 
 const apiConfig = axios.create({
 	baseURL: "https://api.escuelajs.co/api/v1/",
@@ -17,7 +17,7 @@ const apiConfig = axios.create({
 
 apiConfig.interceptors.request.use(
 	(config) => {
-		const token = localStorage.getItem("authToken");
+		const token = localStorage.getItem("access_token");
 		if (token) {
 			config.headers.Authorization = `Bearer ${token}`;
 		}
@@ -34,8 +34,7 @@ apiConfig.interceptors.response.use(
 	},
 	(error) => {
 		if (error.response && error.response.status === 401) {
-			localStorage.removeItem("authToken");
-			window.location.href = "/login";
+			localStorage.removeItem("access_token");
 		}
 
 		return Promise.reject(error);
@@ -85,11 +84,6 @@ const api = {
 			const response = await apiConfig.get<Category[]>("/categories");
 			return response.data;
 		},
-
-		getById: async (id: number): Promise<Category> => {
-			const response = await apiConfig.get<Category>(`/categories/${id}`);
-			return response.data;
-		},
 	},
 
 	// Auth endpoints
@@ -99,14 +93,14 @@ const api = {
 			return response.data;
 		},
 
-		register: async (userData: RegisterData): Promise<User> => {
-			const response = await apiConfig.post<User>("/auth/register", userData);
-			return response.data;
+		logout: async (queryClient?: QueryClient) => {
+			localStorage.removeItem("access_token");
+			queryClient?.invalidateQueries({ queryKey: ["profile"] });
 		},
 
-		logout: async (): Promise<void> => {
-			localStorage.removeItem("authToken");
-			window.location.href = "/login";
+		getProfile: async () => {
+			const response = await apiConfig.get<User>(`/auth/profile`);
+			return response.data;
 		},
 	},
 };
