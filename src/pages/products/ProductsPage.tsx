@@ -27,7 +27,7 @@ function ProductsPage() {
 			const offset = page * pageSize;
 
 			const [all, paginated] = await Promise.all([
-				// All products for total count
+				// All products for total count used in pagination
 				api.products.getAll({
 					title,
 					categorySlug: category,
@@ -60,8 +60,7 @@ function ProductsPage() {
 	const categoriesQuery = useQuery({
 		queryKey: ["categories"],
 		queryFn: async (): Promise<Category[]> => {
-			const response = await fetch(`https://api.escuelajs.co/api/v1/categories`);
-			return response.json();
+			return api.categories.getAll();
 		},
 	});
 
@@ -153,8 +152,6 @@ function ProductsPage() {
 	};
 
 	const debounceSearchChange = debounce(onSearchChange, 300);
-	// const debounceUpdatePriceMin = debounce(updatePriceMin, 300);
-	// const debounceUpdatePriceMax = debounce(updatePriceMax, 300);
 
 	if (isPageLoading) {
 		return (
