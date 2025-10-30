@@ -95,7 +95,7 @@ const api = {
 
 		logout: async (queryClient?: QueryClient) => {
 			localStorage.removeItem("access_token");
-			queryClient?.invalidateQueries({ queryKey: ["profile"] });
+			queryClient?.resetQueries({ queryKey: ["profile"] });
 		},
 
 		getProfile: async () => {
