@@ -1,7 +1,7 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import api from "./api.ts";
-import { AuthContext } from "./useAuth.ts";
+import api from "../utils/api.ts";
+import { AuthContext } from "../utils/useAuth.ts";
 
 export const AuthProvider = ({ children }: React.PropsWithChildren) => {
 	const profileQuery = useQuery({

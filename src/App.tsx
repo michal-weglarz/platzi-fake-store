@@ -4,9 +4,9 @@ import Navbar from "./components/Navbar.tsx";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { lazy, Suspense } from "react";
 import PageLoading from "./components/PageLoading.tsx";
-import { AuthProvider } from "./utils/AuthContext.tsx";
+import { AuthProvider } from "./components/AuthContext.tsx";
 import { ToastContainer } from "react-toastify";
-import ProtectedRoute from "./utils/ProtectedRoute.tsx";
+import ProtectedRoute from "./components/ProtectedRoute.tsx";
 
 const LoginPage = lazy(() => import("./pages/login/LoginPage.tsx"));
 const ProductsPage = lazy(() => import("./pages/products/ProductsPage.tsx"));

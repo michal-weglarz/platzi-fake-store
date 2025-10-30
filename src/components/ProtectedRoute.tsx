@@ -1,4 +1,4 @@
-import { useAuth } from "./useAuth.ts";
+import { useAuth } from "../utils/useAuth.ts";
 import { useLocation } from "wouter";
 import { type PropsWithChildren, useEffect } from "react";
 
