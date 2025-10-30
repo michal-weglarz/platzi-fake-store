@@ -210,10 +210,10 @@ function ProductsPage() {
 
 				<div className="flex flex-col self-start w-full">
 					<h3 className={"text-lg font-bold mb"}>Filters</h3>
-					<div className={"flex flex-row gap-4"}>
-						<fieldset className={"fieldset"}>
+					<div className={"flex flex-col sm:flex-row gap-4"}>
+						<fieldset className={"fieldset flex-1"}>
 							<legend className="fieldset-legend">Title</legend>
-							<label className="input w-[250px]">
+							<label className="input w-full">
 								<SearchIcon />
 								<input
 									type="search"
@@ -224,10 +224,10 @@ function ProductsPage() {
 							</label>
 						</fieldset>
 
-						<fieldset className={"fieldset"}>
+						<fieldset className={"fieldset flex-1"}>
 							<legend className="fieldset-legend">Category</legend>
 							<select
-								className="select w-[250px]"
+								className="select w-full"
 								value={category}
 								onChange={changeSelectedCategory}
 							>
@@ -243,7 +243,7 @@ function ProductsPage() {
 							</select>
 						</fieldset>
 
-						<fieldset className={"fieldset w-[250px]"}>
+						<fieldset className={"fieldset flex-1"}>
 							<legend className="fieldset-legend">Price range</legend>
 							<div className={"flex flex-row gap-2"}>
 								<label className="input">
@@ -274,7 +274,7 @@ function ProductsPage() {
 					<div className={"flex flex-col gap-2 items-end w-full"}>
 						<div className="flex row gap-4 w-full justify-between items-end">
 							<select
-								className="select select-ghost select-sm w-[150px]"
+								className="select select-ghost select-sm max-w-[150px]"
 								value={sortBy}
 								onChange={setSortBy}
 							>
@@ -296,7 +296,7 @@ function ProductsPage() {
 							/>
 						</div>
 
-						<ul className="list bg-base-100 rounded-box shadow-md w-full">
+						<ul className="list bg-base-100 rounded-box shadow-md w-full gap-4">
 							<li className="p-4 pb-2 text-xs opacity-60 tracking-wide">
 								{page * pageSize + 1}-
 								{Math.min((page + 1) * pageSize, productsQuery.data.total)} out of{" "}
@@ -307,13 +307,16 @@ function ProductsPage() {
 								<li className={"list-row"}>No results</li>
 							) : (
 								productsQuery.data.products.sort(sortProducts).map((product) => (
-									<li key={product.id} className="list-row">
+									<li
+										key={product.id}
+										className="list-row items-center flex flex-col sm:grid sm:items-start p-4 gap-2"
+									>
 										{product.images.length > 1 && (
-											<figure className="hover-gallery max-w-48">
+											<figure className="hover-gallery size-64 sm:size-48">
 												{product.images.map((image) => (
 													<img
 														key={image}
-														className="size-48 rounded-box"
+														className="size-64 sm:size-48 rounded-box"
 														src={image}
 														alt={product.title}
 													/>
@@ -326,10 +329,10 @@ function ProductsPage() {
 											<object
 												data="https://placehold.co/200x200.png"
 												type="image/png"
-												className="size-48 rounded-box"
+												className="size-64 sm:size-48 rounded-box"
 											>
 												<img
-													className="size-48 rounded-box"
+													className="size-64 sm:size-48 rounded-box"
 													src={product.images[0]}
 													alt={product.title}
 												/>
@@ -348,7 +351,7 @@ function ProductsPage() {
 											</div>
 											<div
 												className={
-													"flex w-fit min-w-16 font-semibold text-lg list-col-grow"
+													"flex w-fit min-w-16 font-semibold text-lg list-col-grow justify-center"
 												}
 											>
 												${product.price}

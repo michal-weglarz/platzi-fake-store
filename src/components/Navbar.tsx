@@ -10,9 +10,6 @@ function Navbar() {
 			</div>
 			<ul className="menu menu-horizontal px-1 flex flex-row justify-between items-center gap-2">
 				<li>
-					<Link to={"/404-page"}>404 page</Link>
-				</li>
-				<li>
 					<Link to={"/products"}>Products</Link>
 				</li>
 				<li>
