@@ -1,26 +1,31 @@
 import api from "../../utils/api.ts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { type FormEvent, useState } from "react";
+import { type FormEvent } from "react";
 import { useLocation } from "wouter";
+import { toast } from "react-toastify";
+import type { User } from "../../utils/types.ts";
 
 function LoginPage() {
 	const queryClient = useQueryClient();
 	const [, navigate] = useLocation();
-	const [isError, setIsError] = useState(false);
+
 	const mutation = useMutation({
 		mutationFn: api.auth.login,
-		onSuccess: (data) => {
+		onSuccess: async (data) => {
 			if (data.access_token) {
 				localStorage.setItem("access_token", data.access_token);
 			}
-			queryClient.refetchQueries({ queryKey: ["profile"] });
+			await queryClient.refetchQueries({ queryKey: ["profile"] });
+			const user = queryClient.getQueryData(["profile"]) as User;
+			if (user.name) {
+				toast.success(`Welcome back, ${user.name}!`);
+			} else {
+				toast.success(`Welcome back!`);
+			}
 			navigate("/");
 		},
 		onError: () => {
-			setIsError(true);
-			setTimeout(() => {
-				setIsError(false);
-			}, 3_000);
+			toast.error("Failed to login. Try again.");
 		},
 	});
 
@@ -65,14 +70,6 @@ function LoginPage() {
 					</fieldset>
 				</form>
 			</div>
-
-			{isError && (
-				<div className="toast">
-					<div className="alert alert-error">
-						<span>Failed to log in. Try again.</span>
-					</div>
-				</div>
-			)}
 		</>
 	);
 }
