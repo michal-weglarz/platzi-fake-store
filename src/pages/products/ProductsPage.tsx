@@ -75,40 +75,28 @@ function ProductsPage() {
 	const isPageError = productsQuery.isError || categoriesQuery.isError;
 
 	const changeSelectedPage = (page: number) => {
-		setSearchParams({
-			page: page.toString(),
-			pageSize: pageSize.toString(),
-			sortBy,
-			title,
-			category,
-			priceMin: priceMin.toString(),
-			priceMax: priceMax.toString(),
+		setSearchParams((prev) => {
+			prev.set("page", page.toString());
+			return prev;
 		});
 	};
 
 	const changeSelectedPageSize = (event: ChangeEvent<HTMLSelectElement>) => {
 		const value = event.target.value;
-		setSearchParams({
-			page: "0",
-			pageSize: value,
-			sortBy,
-			title,
-			category,
-			priceMin: priceMin.toString(),
-			priceMax: priceMax.toString(),
+
+		setSearchParams((prev) => {
+			prev.set("page", "0");
+			prev.set("pageSize", value);
+			return prev;
 		});
 	};
 
 	const setSortBy = (event: ChangeEvent<HTMLSelectElement>) => {
 		const value = event.target.value;
-		setSearchParams({
-			page: page.toString(),
-			pageSize: pageSize.toString(),
-			sortBy: value,
-			title,
-			category,
-			priceMin: priceMin.toString(),
-			priceMax: priceMax.toString(),
+
+		setSearchParams((prev) => {
+			prev.set("sortBy", value);
+			return prev;
 		});
 	};
 
@@ -130,27 +118,21 @@ function ProductsPage() {
 
 	const changeSelectedCategory = (event: ChangeEvent<HTMLSelectElement>) => {
 		const value = event.target.value;
-		setSearchParams({
-			page: "0",
-			pageSize: pageSize.toString(),
-			sortBy: sortBy,
-			title,
-			category: value,
-			priceMin: priceMin.toString(),
-			priceMax: priceMax.toString(),
+
+		setSearchParams((prev) => {
+			prev.set("page", "0");
+			prev.set("category", value);
+			return prev;
 		});
 	};
 
 	const onSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const value = event.target.value;
-		setSearchParams({
-			page: "0",
-			pageSize: pageSize.toString(),
-			sortBy: sortBy,
-			title: value,
-			category,
-			priceMin: priceMin.toString(),
-			priceMax: priceMax.toString(),
+
+		setSearchParams((prev) => {
+			prev.set("page", "0");
+			prev.set("title", value);
+			return prev;
 		});
 	};
 
@@ -158,14 +140,10 @@ function ProductsPage() {
 		const value = event.target.value;
 		if (parseInt(value) < 0) return;
 
-		setSearchParams({
-			page: "0",
-			pageSize: pageSize.toString(),
-			sortBy,
-			title,
-			category,
-			priceMin: value,
-			priceMax: priceMax.toString(),
+		setSearchParams((prev) => {
+			prev.set("page", "0");
+			prev.set("priceMin", value);
+			return prev;
 		});
 	};
 
@@ -173,14 +151,10 @@ function ProductsPage() {
 		const value = event.target.value;
 		if (parseInt(value) < 0) return;
 
-		setSearchParams({
-			page: "0",
-			pageSize: pageSize.toString(),
-			sortBy,
-			title,
-			category,
-			priceMin: priceMin.toString(),
-			priceMax: value.toString(),
+		setSearchParams((prev) => {
+			prev.set("page", "0");
+			prev.set("priceMax", value);
+			return prev;
 		});
 	};
 
