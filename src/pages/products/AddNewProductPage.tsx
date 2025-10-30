@@ -103,7 +103,7 @@ function AddNewProductPage() {
 						<legend className="fieldset-legend">Price</legend>
 						<input
 							type="number"
-							min="0"
+							min="1"
 							placeholder="Price"
 							className={"input w-full"}
 							required
@@ -112,7 +112,7 @@ function AddNewProductPage() {
 					</fieldset>
 				</div>
 
-				<button type={"submit"} className={"btn btn-primary w-fit mt-4"}>
+				<button type={"submit"} className={"btn btn-neutral w-fit mt-4"}>
 					Create
 				</button>
 			</form>
