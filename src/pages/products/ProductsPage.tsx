@@ -4,10 +4,11 @@ import { Link, useSearchParams } from "wouter";
 import Pagination from "./Pagination.tsx";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_BY } from "../../utils/consts.ts";
 import type { Product, SortBy } from "../../utils/types.ts";
-import { PlusIcon, SearchIcon } from "../../components/Icons.tsx";
+import { EditIcon, PlusIcon, SearchIcon } from "../../components/Icons.tsx";
 import { debounce } from "../../utils/utils.ts";
 import api from "../../utils/api.ts";
 import { useAuth } from "../../utils/useAuth.ts";
+import DeleteProductButton from "./DeleteProductButton.tsx";
 
 function ProductsPage() {
 	const auth = useAuth();
@@ -334,19 +335,30 @@ function ProductsPage() {
 											</object>
 										)}
 
-										<div className={"flex flex-row gap-4"}>
-											<div className="flex flex-col gap-2 list-col-wrap w-full tracking-wide">
-												<p className="text-xl">{product.title}</p>
-												<div className="text-xs uppercase font-semibold opacity-60">
-													{product.category.name}
+										<div className={"flex flex-row gap-4 h-full"}>
+											<div className="flex flex-col gap-2 justify-between content-between h-full w-full">
+												<div className="flex flex-col gap-2 list-col-wrap w-full tracking-wide">
+													<p className="text-xl">{product.title}</p>
+													<div className="text-xs uppercase font-semibold opacity-60">
+														{product.category.name}
+													</div>
+													<p className="text-xs opacity-60">
+														{product.description}
+													</p>
 												</div>
-												<p className="text-xs opacity-60">
-													{product.description}
-												</p>
+												{auth.user && (
+													<div className="flex flex-row gap-2 items-center  self-end">
+														<button className={"btn btn-sm"}>
+															<EditIcon />
+															Edit
+														</button>
+														<DeleteProductButton product={product} />
+													</div>
+												)}
 											</div>
 											<div
 												className={
-													"flex w-fit min-w-16 font-semibold text-lg list-col-grow justify-center"
+													"flex  min-w-16 font-semibold text-xl list-col-grow justify-center"
 												}
 											>
 												${product.price}
