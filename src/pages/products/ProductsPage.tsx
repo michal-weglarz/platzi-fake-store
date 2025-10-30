@@ -25,7 +25,7 @@ function ProductsPage() {
 	const priceMax = searchParams.get("priceMax") ?? "";
 
 	const productsQuery = useQuery({
-		queryKey: ["products", page, pageSize, title, category, priceMin, priceMax],
+		queryKey: ["products", page, pageSize, title, category, priceMin, priceMax].filter(Boolean),
 		queryFn: async () => {
 			const offset = page * pageSize;
 
@@ -338,16 +338,21 @@ function ProductsPage() {
 										<div className={"flex flex-row gap-4 h-full"}>
 											<div className="flex flex-col gap-2 justify-between content-between h-full w-full">
 												<div className="flex flex-col gap-2 list-col-wrap w-full tracking-wide">
-													<p className="text-xl">{product.title}</p>
+													<Link
+														to={`/products/${product.id}`}
+														className={"hover:underline"}
+													>
+														<p className="text-xl">{product.title}</p>
+													</Link>
 													<div className="text-xs uppercase font-semibold opacity-60">
 														{product.category.name}
 													</div>
-													<p className="text-xs opacity-60">
+													<p className="text-xs opacity-60 line-clamp-3">
 														{product.description}
 													</p>
 												</div>
 												{auth.user && (
-													<div className="flex flex-row gap-2 items-center  self-end">
+													<div className="flex flex-row gap-2 items-center ">
 														<button className={"btn btn-sm"}>
 															<EditIcon />
 															Edit
