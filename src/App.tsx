@@ -50,7 +50,7 @@ function App() {
 						<Route>404: No such page!</Route>
 					</Switch>
 				</main>
-				<ToastContainer />
+				<ToastContainer position="bottom-left" />
 			</AuthProvider>
 			<ReactQueryDevtools initialIsOpen={false} />
 		</QueryClientProvider>

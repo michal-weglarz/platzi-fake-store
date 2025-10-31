@@ -27,8 +27,8 @@ function ProductsPage() {
 	const productsQuery = useQuery({
 		queryKey: ["products", page, pageSize, title, category, priceMin, priceMax].filter(Boolean),
 		queryFn: async () => {
-			const offset = page * pageSize;
-
+			const offset = Math.max((page - 1) * pageSize, 0);
+			console.log("offset", offset);
 			const [all, paginated] = await Promise.all([
 				// All products for total count used in pagination
 				api.products.getAll({
@@ -81,7 +81,7 @@ function ProductsPage() {
 		const value = event.target.value;
 
 		setSearchParams((prev) => {
-			prev.set("page", "0");
+			prev.set("page", "1");
 			prev.set("pageSize", value);
 			return prev;
 		});
@@ -116,7 +116,7 @@ function ProductsPage() {
 		const value = event.target.value;
 
 		setSearchParams((prev) => {
-			prev.set("page", "0");
+			prev.set("page", "1");
 			prev.set("category", value);
 			return prev;
 		});
@@ -126,7 +126,7 @@ function ProductsPage() {
 		const value = event.target.value;
 
 		setSearchParams((prev) => {
-			prev.set("page", "0");
+			prev.set("page", "1");
 			prev.set("title", value);
 			return prev;
 		});
@@ -137,7 +137,7 @@ function ProductsPage() {
 		if (parseInt(value) < 0) return;
 
 		setSearchParams((prev) => {
-			prev.set("page", "0");
+			prev.set("page", "1");
 			prev.set("priceMin", value);
 			return prev;
 		});
@@ -148,7 +148,7 @@ function ProductsPage() {
 		if (parseInt(value) < 0) return;
 
 		setSearchParams((prev) => {
-			prev.set("page", "0");
+			prev.set("page", "1");
 			prev.set("priceMax", value);
 			return prev;
 		});
@@ -266,7 +266,7 @@ function ProductsPage() {
 					<div className="divider mb-0"></div>
 				</div>
 
-				{pageSize > 0 && page >= 0 ? (
+				{pageSize > 0 && page > 0 ? (
 					<div className={"flex flex-col gap-2 items-end w-full"}>
 						<div className="flex row gap-4 w-full justify-between items-end">
 							<select
@@ -294,8 +294,8 @@ function ProductsPage() {
 
 						<ul className="list bg-base-100 rounded-box shadow-md w-full gap-4">
 							<li className="p-4 pb-2 text-xs opacity-60 tracking-wide">
-								{page * pageSize + 1}-
-								{Math.min((page + 1) * pageSize, productsQuery.data.total)} out of{" "}
+								{(page - 1) * pageSize + 1}-
+								{Math.min(page * pageSize, productsQuery.data.total)} of{" "}
 								{productsQuery.data.total}
 							</li>
 
