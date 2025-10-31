@@ -26,11 +26,7 @@ function Pagination(props: Props) {
 
 	return (
 		<div className={"flex flex-row gap-2"}>
-			<select
-				className="select select-sm w-fit"
-				value={props.pageSize}
-				onChange={props.changeSelectedPageSize}
-			>
+			<select className="select select-sm w-fit" value={props.pageSize} onChange={props.changeSelectedPageSize}>
 				<option disabled>Page size</option>
 				<option>5</option>
 				<option>10</option>
@@ -59,7 +55,7 @@ function Pagination(props: Props) {
 				</button>
 				<div className="flex flex-row gap-1 justify-center items-center">
 					<input
-						className={"input input-sm w-[60px]"}
+						className={"input input-sm w-[50px]"}
 						type={"number"}
 						min={"1"}
 						value={inputValue}

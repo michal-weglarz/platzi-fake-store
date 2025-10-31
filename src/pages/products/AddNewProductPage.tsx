@@ -1,4 +1,3 @@
-import { BackArrowIcon } from "../../components/Icons.tsx";
 import { Link, useLocation } from "wouter";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import api from "../../utils/api.ts";
@@ -49,12 +48,17 @@ function AddNewProductPage() {
 	return (
 		<div className={"flex flex-col gap-8 items-end"}>
 			<div className="flex row justify-between w-full items-center">
-				<div className={"flex flex-row gap-2 items-center"}>
-					<Link to={"/products"} className={"btn btn-ghost btn-square"}>
-						<BackArrowIcon />
-					</Link>
-
-					<h1 className="text-4xl font-bold tracking-wide self-start">New product</h1>
+				<h1 className="text-xl font-bold tracking-wide self-start">Add product</h1>
+				<div className="breadcrumbs text-sm">
+					<ul>
+						<li>
+							<Link to={"/"}>Home</Link>
+						</li>
+						<li>
+							<Link to={"/products"}>Products</Link>
+						</li>
+						<li>Add Product</li>
+					</ul>
 				</div>
 			</div>
 

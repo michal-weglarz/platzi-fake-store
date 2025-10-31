@@ -25,7 +25,7 @@ function App() {
 		<QueryClientProvider client={queryClient}>
 			<AuthProvider>
 				<Navbar />
-				<main className="max-w-5xl mx-auto pt-24 px-4 pb-20">
+				<main className="max-w-6xl mx-auto pt-24 px-4 pb-20 bg-slate-50">
 					<Switch>
 						<Route path="/login">
 							<Suspense fallback={<PageLoading />}>

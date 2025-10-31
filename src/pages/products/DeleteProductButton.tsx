@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../../utils/api.ts";
 import { toast } from "react-toastify";
 import type { Product } from "../../utils/types.ts";
-import { useSearchParams } from "wouter";
 
 interface Props {
 	product: Product;
@@ -11,17 +10,17 @@ interface Props {
 
 function DeleteProductButton(props: Props) {
 	const queryClient = useQueryClient();
-	const [, setSearchParams] = useSearchParams();
+	// const [, setSearchParams] = useSearchParams();
 
 	const mutation = useMutation({
 		mutationFn: api.products.delete,
 		onSuccess: () => {
 			toast.success(`Product ${props.product.title} has been deleted!`);
 			queryClient.refetchQueries({ queryKey: ["products"], exact: false });
-			setSearchParams((prev) => {
-				prev.set("page", "0");
-				return prev;
-			});
+			// setSearchParams((prev) => {
+			// 	prev.set("page", "0");
+			// 	return prev;
+			// });
 		},
 		onError: () => {
 			toast.error(`An error occurred while deleting the product!`);
@@ -36,23 +35,24 @@ function DeleteProductButton(props: Props) {
 
 	return (
 		<>
-			<button
-				className={"btn btn-sm"}
-				onClick={() => {
-					const dialog = document.getElementById(dialogId) as HTMLDialogElement;
-					if (dialog) {
-						dialog.showModal();
-					}
-				}}
-			>
-				<DeleteIcon />
-				Delete
-			</button>
+			<div className={"tooltip"} data-tip={"Delete"}>
+				<button
+					className={"btn btn-sm btn-ghost btn-square"}
+					onClick={() => {
+						const dialog = document.getElementById(dialogId) as HTMLDialogElement;
+						if (dialog) {
+							dialog.showModal();
+						}
+					}}
+				>
+					<DeleteIcon />
+				</button>
+			</div>
 			<dialog id={dialogId} className="modal">
 				<div className="modal-box">
 					<h3 className="font-bold text-lg">Are you sure?</h3>
-					<p className="py-4">
-						You're going to delete <b>{props.product.title}</b>. This action is
+					<p className="py-4 font-normal">
+						You're going to delete <b className={"font-bold"}>{props.product.title}</b>. This action is
 						irreversible. Once you delete the product, you can't restore it.
 					</p>
 					<div className="modal-action">
