@@ -95,7 +95,7 @@ function ChevronRightIcon() {
 			viewBox="0 0 24 24"
 			strokeWidth={1.5}
 			stroke="currentColor"
-			className="size-6"
+			className="size-5"
 		>
 			<path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
 		</svg>
@@ -110,7 +110,7 @@ function ChevronLeftIcon() {
 			viewBox="0 0 24 24"
 			strokeWidth={1.5}
 			stroke="currentColor"
-			className="size-6"
+			className="size-5"
 		>
 			<path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
 		</svg>
@@ -125,7 +125,7 @@ function DoubleChevronRightIcon() {
 			viewBox="0 0 24 24"
 			strokeWidth={1.5}
 			stroke="currentColor"
-			className="size-6"
+			className="size-5"
 		>
 			<path
 				strokeLinecap="round"
@@ -144,7 +144,7 @@ function DoubleChevronLeftIcon() {
 			viewBox="0 0 24 24"
 			strokeWidth={1.5}
 			stroke="currentColor"
-			className="size-6"
+			className="size-5"
 		>
 			<path
 				strokeLinecap="round"
