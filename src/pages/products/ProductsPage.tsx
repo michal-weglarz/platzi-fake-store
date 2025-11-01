@@ -253,7 +253,7 @@ function ProductsPage() {
 								<label className="input input-sm floating-label w-full">
 									<input
 										type="number"
-										min="0"
+										min="1"
 										placeholder="Min price"
 										defaultValue={priceMin}
 										onBlur={updatePriceMin}
@@ -263,7 +263,7 @@ function ProductsPage() {
 								<label className="input input-sm floating-label w-full">
 									<input
 										type="number"
-										min="0"
+										min="1"
 										placeholder="Max price"
 										defaultValue={priceMax}
 										onBlur={updatePriceMax}

@@ -43,7 +43,12 @@ function Pagination(props: Props) {
 		<div className={"flex flex-row justify-center md:justify-between gap-2 items-center"}>
 			<label className="select select-xs w-[175px] hidden md:flex">
 				<span className="label">Per page</span>
-				<select className="select select-xs" value={props.pageSize} onChange={props.changeSelectedPageSize}>
+				<select
+					disabled={props.total === 0}
+					className="select select-xs"
+					value={props.pageSize}
+					onChange={props.changeSelectedPageSize}
+				>
 					<option disabled>Page size</option>
 					<option>5</option>
 					<option>10</option>
@@ -55,13 +60,15 @@ function Pagination(props: Props) {
 			<div className="p-4 pb-2 text-xs opacity-60 tracking-wide hidden md:flex">
 				Showing &nbsp;
 				<b>
-					{(props.page - 1) * props.pageSize + 1} to {Math.min(props.page * props.pageSize, props.total)}
+					{(props.page - 1) * props.pageSize + (props.total > 0 ? 1 : 0)} to{" "}
+					{Math.min(props.page * props.pageSize, props.total)}
 				</b>
 				&nbsp; of {props.total} items
 			</div>
 
 			<div className="join gap-2">
 				<button
+					disabled={props.total === 0}
 					className={"btn btn-square btn-xs"}
 					onClick={() => {
 						props.changeSelectedPage(1);
@@ -69,11 +76,16 @@ function Pagination(props: Props) {
 				>
 					<DoubleChevronLeftIcon />
 				</button>
-				<button className={"btn btn-square btn-xs"} onClick={() => updateSelectedPage(props.page - 1)}>
+				<button
+					disabled={props.total === 0}
+					className={"btn btn-square btn-xs"}
+					onClick={() => updateSelectedPage(props.page - 1)}
+				>
 					<ChevronLeftIcon />
 				</button>
 				<div className="flex flex-row gap-1 justify-center items-center">
 					<input
+						disabled={props.total === 0}
 						className={"input input-xs w-[50px]"}
 						type={"number"}
 						min={"1"}
@@ -83,10 +95,15 @@ function Pagination(props: Props) {
 					/>
 					<p className={"text-sm font-light"}>of {numberOfPages}</p>
 				</div>
-				<button className={"btn btn-square btn-xs"} onClick={() => updateSelectedPage(props.page + 1)}>
+				<button
+					disabled={props.total === 0}
+					className={"btn btn-square btn-xs"}
+					onClick={() => updateSelectedPage(props.page + 1)}
+				>
 					<ChevronRightIcon />
 				</button>
 				<button
+					disabled={props.total === 0}
 					className={"btn btn-square btn-xs"}
 					onClick={() => {
 						props.changeSelectedPage(numberOfPages);
