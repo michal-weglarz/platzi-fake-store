@@ -1,31 +1,25 @@
 import { Link } from "wouter";
-import { PlusIcon } from "../../components/Icons.tsx";
-import { useAuth } from "../../utils/useAuth.ts";
 
-function PageHeader() {
-	const auth = useAuth();
+interface Props {
+	breadcrumbs: { name: string; link?: string }[];
+	title: string;
+	actionButton?: React.ReactNode;
+}
 
+function PageHeader(props: Props) {
 	return (
 		<div className="flex flex-col md:flex-row justify-between w-full gap-4 md:items-end">
 			<div className="flex flex-col gap-2">
 				<div className="breadcrumbs text-sm pb-0">
 					<ul>
-						<li>
-							<Link to={"/"}>Home</Link>
-						</li>
-						<li>Products</li>
+						{props.breadcrumbs?.map((item, i) => (
+							<li key={i}>{item.link != null ? <Link to={item.link}>{item.name}</Link> : item.name}</li>
+						))}
 					</ul>
 				</div>
-				<h1 className="text-xl font-bold tracking-wide self-start">Products</h1>
+				<h1 className="text-xl font-bold tracking-wide self-start">{props.title}</h1>
 			</div>
-			{auth.user != null && (
-				<div className={"flex"}>
-					<Link to={"/products/new"} className={"btn btn-neutral btn-sm max-md:w-full"}>
-						<PlusIcon />
-						<span>Add new product</span>
-					</Link>
-				</div>
-			)}
+			{props.actionButton}
 		</div>
 	);
 }

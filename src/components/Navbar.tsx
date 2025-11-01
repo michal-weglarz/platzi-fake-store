@@ -11,7 +11,8 @@ function Navbar() {
 		<nav className="navbar bg-base-100 shadow-sm fixed z-2 top-0">
 			<div className="flex-1">
 				<Link to={"/products"} className="btn btn-ghost text-xl">
-					Platzi Fake Store
+					Platzi
+					<span className={"md:block hidden"}>Fake Store</span>
 				</Link>
 			</div>
 			<ul className="menu menu-horizontal px-4 flex flex-row justify-between items-center gap-2">

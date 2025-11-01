@@ -4,12 +4,11 @@ import { DEFAULT_PAGE_SIZE } from "../../utils/consts.ts";
 function ProductsLoadingSkeleton() {
 	return (
 		<div className={"flex flex-col gap-6 items-end"}>
-			<PageHeader />
+			<PageHeader breadcrumbs={[{ name: "Home", link: "/" }, { name: "Products" }]} title={"Products"} />
 
 			<div className="card bg-base-100 w-full shadow-sm">
 				<div className={"flex flex-col-reverse md:flex-row gap-4 sm:justify-between items-center"}>
 					<div className={"flex flex-col md:flex-row gap-3 p-4 sm:justify-between w-full"}>
-						<div className="skeleton h-8 w-full"></div>
 						<div className="skeleton h-8 w-full"></div>
 						<div className="skeleton h-8 w-full"></div>
 						<div className="skeleton h-8 w-full"></div>

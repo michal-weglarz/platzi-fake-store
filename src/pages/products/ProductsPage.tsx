@@ -4,7 +4,7 @@ import { Link, useSearchParams } from "wouter";
 import Pagination from "./Pagination.tsx";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_BY } from "../../utils/consts.ts";
 import type { Product, SortBy } from "../../utils/types.ts";
-import { ArrowDownIcon, ArrowUpIcon, EditIcon, EyeIcon, SearchIcon } from "../../components/Icons.tsx";
+import { ArrowDownIcon, ArrowUpIcon, EditIcon, EyeIcon, PlusIcon, SearchIcon } from "../../components/Icons.tsx";
 import { debounce } from "../../utils/utils.ts";
 import api from "../../utils/api.ts";
 import { useAuth } from "../../utils/useAuth.ts";
@@ -216,7 +216,20 @@ function ProductsPage() {
 
 		return (
 			<div className={"flex flex-col gap-6 items-end"}>
-				<PageHeader />
+				<PageHeader
+					breadcrumbs={[{ name: "Home", link: "/" }, { name: "Products" }]}
+					title={"Products"}
+					actionButton={
+						auth.user != null ? (
+							<div className={"flex"}>
+								<Link to={"/products/new"} className={"btn btn-neutral btn-sm max-md:w-full"}>
+									<PlusIcon />
+									<span>Add new product</span>
+								</Link>
+							</div>
+						) : null
+					}
+				/>
 
 				<div className="card bg-base-100 w-full shadow-sm">
 					<div className={"flex flex-col-reverse md:flex-row gap-4 sm:justify-between items-center"}>
@@ -361,7 +374,7 @@ function ProductsPage() {
 														<div>
 															<div className="font-bold line-clamp-1">
 																<Link
-																	to={`/products/${product.slug}`}
+																	to={`/products/${product.id}`}
 																	className="font-bold line-clamp-1 hover:underline"
 																>
 																	{product.title}

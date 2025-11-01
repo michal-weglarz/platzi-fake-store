@@ -1,8 +1,9 @@
-import { Link, useLocation } from "wouter";
+import { useLocation } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../../utils/api.ts";
 import type { ChangeEvent } from "react";
 import { toast } from "react-toastify";
+import PageHeader from "./PageHeader.tsx";
 
 function AddNewProductPage() {
 	const [, navigate] = useLocation();
@@ -48,81 +49,77 @@ function AddNewProductPage() {
 	};
 
 	return (
-		<div className={"flex flex-col gap-8 items-end"}>
-			<div className="flex flex-col gap-2 w-full items-start ">
-				<div className="breadcrumbs text-sm pb-0">
-					<ul>
-						<li>
-							<Link to={"/"}>Home</Link>
-						</li>
-						<li>
-							<Link to={"/products"}>Products</Link>
-						</li>
-						<li>Add product</li>
-					</ul>
-				</div>
-				<h1 className="text-xl font-bold tracking-wide self-start">Add product</h1>
-			</div>
+		<div className={"flex flex-col gap-6 items-end"}>
+			<PageHeader
+				breadcrumbs={[
+					{ name: "Home", link: "/" },
+					{ name: "Products", link: "/products" },
+					{ name: "Add product" },
+				]}
+				title={"Add product"}
+			/>
 
-			<form className={"flex flex-col w-full"} onSubmit={createNewProduct}>
-				<fieldset className={"fieldset flex-1"}>
-					<legend className="fieldset-legend">Title</legend>
-					<input type="text" name={"title"} placeholder="Title" className={"input w-full"} required />
-				</fieldset>
-
-				<fieldset className={"fieldset flex-1 "}>
-					<legend className="fieldset-legend">Description</legend>
-					<textarea
-						className="textarea w-full"
-						placeholder="Description"
-						required
-						name="description"
-					></textarea>
-				</fieldset>
-
-				<div className="flex flex-row gap-2">
+			<div className={"card bg-base-100 w-full shadow-sm p-4"}>
+				<form className={"flex flex-col w-full"} onSubmit={createNewProduct}>
 					<fieldset className={"fieldset flex-1"}>
-						<legend className="fieldset-legend">Category</legend>
-						<select className="select w-full" required name={"categoryId"}>
-							{categoriesQuery.data ? (
-								<>
-									<option disabled>Category</option>
-									{categoriesQuery.data?.map((category) => (
-										<option key={category.id} value={category.id}>
-											{category.name}
-										</option>
-									))}
-								</>
-							) : (
-								<option disabled>No available category</option>
-							)}
-						</select>
+						<legend className="fieldset-legend">Title</legend>
+						<input type="text" name={"title"} placeholder="Title" className={"input w-full"} required />
 					</fieldset>
 
-					<fieldset className={"fieldset flex-1"}>
-						<legend className="fieldset-legend">Price</legend>
-						<input
-							type="number"
-							min="1"
-							placeholder="Price"
-							className={"input w-full"}
+					<fieldset className={"fieldset flex-1 "}>
+						<legend className="fieldset-legend">Description</legend>
+						<textarea
+							className="textarea w-full"
+							placeholder="Description"
 							required
-							name="price"
-						/>
+							name="description"
+						></textarea>
 					</fieldset>
-				</div>
 
-				<button type={"submit"} className={"btn btn-neutral w-fit mt-4"} disabled={mutation.isPending}>
-					{mutation.isPending ? (
-						<>
-							<span className="loading loading-spinner"></span>
-							Adding...
-						</>
-					) : (
-						"Add"
-					)}
-				</button>
-			</form>
+					<div className="flex flex-row gap-2">
+						<fieldset className={"fieldset flex-1"}>
+							<legend className="fieldset-legend">Category</legend>
+							<select className="select w-full" required name={"categoryId"}>
+								{categoriesQuery.data ? (
+									<>
+										<option disabled>Category</option>
+										{categoriesQuery.data?.map((category) => (
+											<option key={category.id} value={category.id}>
+												{category.name}
+											</option>
+										))}
+									</>
+								) : (
+									<option disabled>No available category</option>
+								)}
+							</select>
+						</fieldset>
+
+						<fieldset className={"fieldset flex-1"}>
+							<legend className="fieldset-legend">Price</legend>
+							<input
+								type="number"
+								min="1"
+								placeholder="Price"
+								className={"input w-full"}
+								required
+								name="price"
+							/>
+						</fieldset>
+					</div>
+
+					<button type={"submit"} className={"btn btn-neutral w-fit mt-4"} disabled={mutation.isPending}>
+						{mutation.isPending ? (
+							<>
+								<span className="loading loading-spinner"></span>
+								Adding...
+							</>
+						) : (
+							"Add"
+						)}
+					</button>
+				</form>
+			</div>
 		</div>
 	);
 }
