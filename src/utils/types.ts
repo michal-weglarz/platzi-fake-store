@@ -19,7 +19,14 @@ export interface Product {
 	updatedAt: string;
 }
 
-export type SortBy = "default" | "title" | "category" | "price-asc" | "price-desc";
+export type SortBy =
+	| "default"
+	| "title-asc"
+	| "title-desc"
+	| "category-asc"
+	| "category-desc"
+	| "price-asc"
+	| "price-desc";
 
 export interface User {
 	id: number;

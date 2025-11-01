@@ -4,7 +4,7 @@ import { Link, useSearchParams } from "wouter";
 import Pagination from "./Pagination.tsx";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_BY } from "../../utils/consts.ts";
 import type { Product, SortBy } from "../../utils/types.ts";
-import { EditIcon, EyeIcon, PlusIcon, SearchIcon } from "../../components/Icons.tsx";
+import { ArrowDownIcon, ArrowUpIcon, EditIcon, EyeIcon, PlusIcon, SearchIcon } from "../../components/Icons.tsx";
 import { debounce } from "../../utils/utils.ts";
 import api from "../../utils/api.ts";
 import { useAuth } from "../../utils/useAuth.ts";
@@ -84,9 +84,7 @@ function ProductsPage() {
 		});
 	};
 
-	const setSortBy = (event: ChangeEvent<HTMLSelectElement>) => {
-		const value = event.target.value;
-
+	const setSortBy = (value: SortBy) => {
 		setSearchParams((prev) => {
 			prev.set("sortBy", value);
 			return prev;
@@ -94,11 +92,17 @@ function ProductsPage() {
 	};
 
 	const sortProducts = (a: Product, b: Product) => {
-		if (sortBy === "title") {
+		if (sortBy === "title-asc") {
 			return a.title.localeCompare(b.title);
 		}
-		if (sortBy === "category") {
+		if (sortBy === "title-desc") {
+			return b.title.localeCompare(a.title);
+		}
+		if (sortBy === "category-asc") {
 			return a.category.name.localeCompare(b.category.name);
+		}
+		if (sortBy === "category-desc") {
+			return b.category.name.localeCompare(a.category.name);
 		}
 		if (sortBy === "price-asc") {
 			return a.price - b.price;
@@ -199,6 +203,8 @@ function ProductsPage() {
 	}
 
 	if (productsQuery.data && categoriesQuery.data) {
+		const areParamsValid = pageSize > 0 && page > 0;
+
 		return (
 			<div className={"flex flex-col gap-8 items-end"}>
 				<div className="flex row justify-between w-full items-center">
@@ -214,16 +220,17 @@ function ProductsPage() {
 				</div>
 
 				<div className="card bg-base-100 w-full shadow-sm">
-					<div className={"flex flex-col sm:flex-row gap-4 sm:justify-between items-center"}>
-						<div className={"flex flex-col sm:flex-row gap-4 p-4 sm:justify-between flex-2/3 w-full"}>
-							<label className="input input-sm w-full ">
+					<div className={"flex flex-col-reverse md:flex-row gap-4 sm:justify-between items-center"}>
+						<div className={"flex flex-col md:flex-row gap-3 p-4 sm:justify-between flex-5/6 w-full"}>
+							<label className="input input-sm w-full floating-label">
 								<SearchIcon />
 								<input
 									type="search"
-									placeholder="Search by title"
+									placeholder="Search title"
 									defaultValue={title ?? ""}
 									onChange={debounceSearchChange}
 								/>
+								<span>Search title</span>
 							</label>
 
 							<select
@@ -233,7 +240,7 @@ function ProductsPage() {
 							>
 								<option disabled>Category</option>
 								<option key={"all"} value={""}>
-									All
+									All categories
 								</option>
 								{categoriesQuery.data.map((category) => (
 									<option key={category.id} value={category.slug}>
@@ -242,37 +249,41 @@ function ProductsPage() {
 								))}
 							</select>
 
-							<div className={"flex flex-row gap-2 w-full"}>
-								<label className="input input-sm">
+							<div className={"flex flex-row gap-1 w-full"}>
+								<label className="input input-sm floating-label w-full">
 									<input
 										type="number"
 										min="0"
-										placeholder="Min"
-										value={priceMin}
-										onChange={updatePriceMin}
+										placeholder="Min price"
+										defaultValue={priceMin}
+										onBlur={updatePriceMin}
 									/>
+									<span>Min price</span>
 								</label>
-								<label className="input input-sm">
+								<label className="input input-sm floating-label w-full">
 									<input
 										type="number"
 										min="0"
-										placeholder="Max"
-										value={priceMax}
-										onChange={updatePriceMax}
+										placeholder="Max price"
+										defaultValue={priceMax}
+										onBlur={updatePriceMax}
 									/>
+									<span>Max price</span>
 								</label>
 							</div>
 
 							<button className={"btn btn-ghost btn-sm"} onClick={resetFilters}>
 								Reset
+								<span className={"visible sm:hidden"}>filters</span>
 							</button>
 						</div>
 
 						{auth.user != null && (
-							<div className={"flex flex-1/4 justify-end p-4"}>
-								<Link to={"/products/new"} className={"btn max-sm:btn-square btn-neutral btn-sm"}>
+							<div className={"flex max-md:w-full flex-1/6 justify-end px-4 max-sm:pt-4"}>
+								<Link to={"/products/new"} className={"btn btn-neutral btn-sm max-md:w-full"}>
 									<PlusIcon />
-									<span className={"max-sm:hidden"}>Add new</span>
+									<span>Add new</span>
+									<span className={"visible md:hidden"}>product</span>
 								</Link>
 							</div>
 						)}
@@ -280,82 +291,123 @@ function ProductsPage() {
 
 					<div className="card-body">
 						<div className="overflow-x-auto">
-							<table className="table">
-								<thead>
-									<tr>
-										<th className={"min-w-[300px] max-w-[400px]"}>Title</th>
-										<th>Category</th>
-										<th>Price</th>
-										<th>Action</th>
-									</tr>
-								</thead>
-								<tbody>
-									{productsQuery.data.products.map((product) => (
-										<tr key={product.id}>
-											<td>
-												<div className="flex items-center gap-3">
-													<div className="avatar">
-														<div className="mask h-12 w-12">
-															<img src={product.images[0]} alt="Product image" />
-														</div>
-													</div>
-													<div>
-														<div className="font-bold line-clamp-1">
-															<Link
-																to={`/products/${product.slug}`}
-																className="font-bold line-clamp-1"
-															>
-																{product.title}
-															</Link>
-														</div>
-														<span className="badge badge-ghost badge-sm ">
-															ID#{product.id}
-														</span>
-													</div>
+							{areParamsValid ? (
+								<table className="table">
+									<thead>
+										<tr>
+											<th
+												className={"hover:cursor-pointer hover:bg-slate-50"}
+												role={"button"}
+												onClick={() => {
+													if (sortBy === "title-asc") {
+														setSortBy("title-desc");
+													} else {
+														setSortBy("title-asc");
+													}
+												}}
+											>
+												<div className={"flex flex-row gap-2 items-center"}>
+													Title
+													{sortBy === "title-asc" && <ArrowUpIcon />}
+													{sortBy === "title-desc" && <ArrowDownIcon />}
 												</div>
-											</td>
-											<td>{product.category.name}</td>
-											<td>${product.price}</td>
-											<th>
-												{auth.user && (
-													<div className="flex flex-row gap-2 items-center ">
-														<div className="tooltip" data-tip="Edit">
-															<button className={"btn btn-sm btn-square btn-ghost"}>
-																<EditIcon />
-															</button>
-														</div>
-
-														<div className="tooltip" data-tip="See details">
-															<button className={"btn btn-sm btn-square btn-ghost"}>
-																<EyeIcon />
-															</button>
-														</div>
-
-														<DeleteProductButton product={product} />
-													</div>
-												)}
 											</th>
+											<th
+												className={"hover:cursor-pointer hover:bg-slate-50"}
+												onClick={() => {
+													if (sortBy === "category-asc") {
+														setSortBy("category-desc");
+													} else {
+														setSortBy("category-asc");
+													}
+												}}
+											>
+												<div className={"flex flex-row gap-2 items-center"}>
+													Category
+													{sortBy === "category-asc" && <ArrowUpIcon />}
+													{sortBy === "category-desc" && <ArrowDownIcon />}
+												</div>
+											</th>
+											<th
+												className={"hover:cursor-pointer hover:bg-slate-50"}
+												onClick={() => {
+													if (sortBy === "price-asc") {
+														setSortBy("price-desc");
+													} else {
+														setSortBy("price-asc");
+													}
+												}}
+											>
+												<div className={"flex flex-row gap-2 items-center"}>
+													Price
+													{sortBy === "price-asc" && <ArrowUpIcon />}
+													{sortBy === "price-desc" && <ArrowDownIcon />}
+												</div>
+											</th>
+											<th className={"w-[100px]"}>Action</th>
 										</tr>
-									))}
-								</tbody>
-								<tfoot>
-									<tr>
-										<td colSpan={4}>
-											<div className="flex flex-row justify-center items-center">
-												{/*<select*/}
-												{/*	className="select select-ghost select-sm max-w-[150px]"*/}
-												{/*	value={sortBy}*/}
-												{/*	onChange={setSortBy}*/}
-												{/*>*/}
-												{/*	<option value={"default"} disabled>*/}
-												{/*		Sort by*/}
-												{/*	</option>*/}
-												{/*	<option value={"title"}>Title</option>*/}
-												{/*	<option value={"category"}>Category</option>*/}
-												{/*	<option value={"price-asc"}>Price (asc)</option>*/}
-												{/*	<option value={"price-desc"}>Price (desc)</option>*/}
-												{/*</select>*/}
+									</thead>
+									<tbody>
+										{productsQuery.data.products.length === 0 && (
+											<tr>
+												<td colSpan={4}>
+													<div className={"flex flex-row justify-center items-center"}>
+														No product found
+													</div>
+												</td>
+											</tr>
+										)}
+										{productsQuery.data.products.sort(sortProducts).map((product) => (
+											<tr key={product.id}>
+												<td>
+													<div className="flex items-center gap-3">
+														<div className="avatar">
+															<div className="mask h-12 w-12">
+																<img src={product.images[0]} alt="Product image" />
+															</div>
+														</div>
+														<div>
+															<div className="font-bold line-clamp-1">
+																<Link
+																	to={`/products/${product.slug}`}
+																	className="font-bold line-clamp-1 hover:underline"
+																>
+																	{product.title}
+																</Link>
+															</div>
+															<span className="badge badge-ghost badge-sm">
+																#{product.id}
+															</span>
+														</div>
+													</div>
+												</td>
+												<td>{product.category.name}</td>
+												<td>${product.price}</td>
+												<th>
+													{auth.user && (
+														<div className="flex flex-row gap-2 items-center ">
+															<div className="tooltip" data-tip="Edit">
+																<button className={"btn btn-sm btn-square btn-ghost"}>
+																	<EditIcon />
+																</button>
+															</div>
 
+															<div className="tooltip" data-tip="See details">
+																<button className={"btn btn-sm btn-square btn-ghost"}>
+																	<EyeIcon />
+																</button>
+															</div>
+
+															<DeleteProductButton product={product} />
+														</div>
+													)}
+												</th>
+											</tr>
+										))}
+									</tbody>
+									<tfoot>
+										<tr>
+											<td colSpan={4}>
 												<Pagination
 													page={page}
 													pageSize={pageSize}
@@ -363,188 +415,16 @@ function ProductsPage() {
 													changeSelectedPage={changeSelectedPage}
 													total={productsQuery.data.total}
 												/>
-											</div>
-										</td>
-									</tr>
-								</tfoot>
-							</table>
+											</td>
+										</tr>
+									</tfoot>
+								</table>
+							) : (
+								<div>Invalid URL parameters</div>
+							)}
 						</div>
 					</div>
 				</div>
-
-				{/*<div className="flex flex-col self-start w-full">*/}
-				{/*	<h3 className={"text-lg font-bold mb"}>Filters</h3>*/}
-				{/*	<div className={"flex flex-col sm:flex-row gap-4"}>*/}
-				{/*		<fieldset className={"fieldset flex-1"}>*/}
-				{/*			<legend className="fieldset-legend">Title</legend>*/}
-				{/*			<label className="input w-full">*/}
-				{/*				<SearchIcon />*/}
-				{/*				<input*/}
-				{/*					type="search"*/}
-				{/*					placeholder="Search by title"*/}
-				{/*					defaultValue={title ?? ""}*/}
-				{/*					onChange={debounceSearchChange}*/}
-				{/*				/>*/}
-				{/*			</label>*/}
-				{/*		</fieldset>*/}
-
-				{/*		<fieldset className={"fieldset flex-1"}>*/}
-				{/*			<legend className="fieldset-legend">Category</legend>*/}
-				{/*			<select className="select w-full" value={category} onChange={changeSelectedCategory}>*/}
-				{/*				<option disabled>Category</option>*/}
-				{/*				<option key={"all"} value={""}>*/}
-				{/*					All*/}
-				{/*				</option>*/}
-				{/*				{categoriesQuery.data.map((category) => (*/}
-				{/*					<option key={category.id} value={category.slug}>*/}
-				{/*						{category.name}*/}
-				{/*					</option>*/}
-				{/*				))}*/}
-				{/*			</select>*/}
-				{/*		</fieldset>*/}
-
-				{/*		<fieldset className={"fieldset flex-1"}>*/}
-				{/*			<legend className="fieldset-legend">Price range</legend>*/}
-				{/*			<div className={"flex flex-row gap-2"}>*/}
-				{/*				<label className="input">*/}
-				{/*					<input*/}
-				{/*						type="number"*/}
-				{/*						min="0"*/}
-				{/*						placeholder="Min"*/}
-				{/*						value={priceMin}*/}
-				{/*						onChange={updatePriceMin}*/}
-				{/*					/>*/}
-				{/*				</label>*/}
-				{/*				<label className="input">*/}
-				{/*					<input*/}
-				{/*						type="number"*/}
-				{/*						min="0"*/}
-				{/*						placeholder="Max"*/}
-				{/*						value={priceMax}*/}
-				{/*						onChange={updatePriceMax}*/}
-				{/*					/>*/}
-				{/*				</label>*/}
-				{/*			</div>*/}
-				{/*		</fieldset>*/}
-				{/*	</div>*/}
-				{/*	<div className="divider mb-0"></div>*/}
-				{/*</div>*/}
-
-				{/*{pageSize > 0 && page > 0 ? (*/}
-				{/*	<div className={"flex flex-col gap-2 items-end w-full"}>*/}
-				{/*		<div className="flex row gap-4 w-full justify-between items-end">*/}
-				{/*			<select*/}
-				{/*				className="select select-ghost select-sm max-w-[150px]"*/}
-				{/*				value={sortBy}*/}
-				{/*				onChange={setSortBy}*/}
-				{/*			>*/}
-				{/*				<option value={"default"} disabled>*/}
-				{/*					Sort by*/}
-				{/*				</option>*/}
-				{/*				<option value={"title"}>Title</option>*/}
-				{/*				<option value={"category"}>Category</option>*/}
-				{/*				<option value={"price-asc"}>Price (asc)</option>*/}
-				{/*				<option value={"price-desc"}>Price (desc)</option>*/}
-				{/*			</select>*/}
-
-				{/*			<Pagination*/}
-				{/*				page={page}*/}
-				{/*				pageSize={pageSize}*/}
-				{/*				changeSelectedPageSize={changeSelectedPageSize}*/}
-				{/*				changeSelectedPage={changeSelectedPage}*/}
-				{/*				total={productsQuery.data.total}*/}
-				{/*			/>*/}
-				{/*		</div>*/}
-
-				{/*		<ul className="list bg-base-100 rounded-box shadow-md w-full gap-4">*/}
-				{/*			<li className="p-4 pb-2 text-xs opacity-60 tracking-wide">*/}
-				{/*				{(page - 1) * pageSize + 1}-{Math.min(page * pageSize, productsQuery.data.total)} of{" "}*/}
-				{/*				{productsQuery.data.total}*/}
-				{/*			</li>*/}
-
-				{/*			{productsQuery.data.total === 0 ? (*/}
-				{/*				<li className={"list-row"}>No results</li>*/}
-				{/*			) : (*/}
-				{/*				productsQuery.data.products.sort(sortProducts).map((product) => (*/}
-				{/*					<li*/}
-				{/*						key={product.id}*/}
-				{/*						className="list-row items-center flex flex-col sm:grid sm:items-start p-4 gap-2"*/}
-				{/*					>*/}
-				{/*						{product.images.length > 1 && (*/}
-				{/*							<figure className="hover-gallery size-64 sm:size-48">*/}
-				{/*								{product.images.map((image) => (*/}
-				{/*									<img*/}
-				{/*										key={image}*/}
-				{/*										className="size-64 sm:size-48 rounded-box"*/}
-				{/*										src={image}*/}
-				{/*										alt={product.title}*/}
-				{/*									/>*/}
-				{/*								))}*/}
-				{/*							</figure>*/}
-				{/*						)}*/}
-
-				{/*						{product.images.length === 1 && (*/}
-				{/*							// `object` provides a fallback image*/}
-				{/*							<object*/}
-				{/*								data="https://placehold.co/200x200.png"*/}
-				{/*								type="image/png"*/}
-				{/*								className="size-64 sm:size-48 rounded-box"*/}
-				{/*							>*/}
-				{/*								<img*/}
-				{/*									className="size-64 sm:size-48 rounded-box"*/}
-				{/*									src={product.images[0]}*/}
-				{/*									alt={product.title}*/}
-				{/*								/>*/}
-				{/*							</object>*/}
-				{/*						)}*/}
-
-				{/*						<div className={"flex flex-row gap-4 h-full"}>*/}
-				{/*							<div className="flex flex-col gap-2 justify-between content-between h-full w-full">*/}
-				{/*								<div className="flex flex-col gap-2 list-col-wrap w-full tracking-wide">*/}
-				{/*									<Link to={`/products/${product.id}`} className={"hover:underline"}>*/}
-				{/*										<p className="text-xl">{product.title}</p>*/}
-				{/*									</Link>*/}
-				{/*									<div className="text-xs uppercase font-semibold opacity-60">*/}
-				{/*										{product.category.name}*/}
-				{/*									</div>*/}
-				{/*									<p className="text-xs opacity-60 line-clamp-3">*/}
-				{/*										{product.description}*/}
-				{/*									</p>*/}
-				{/*								</div>*/}
-				{/*								{auth.user && (*/}
-				{/*									<div className="flex flex-row gap-2 items-center ">*/}
-				{/*										<button className={"btn btn-sm"}>*/}
-				{/*											<EditIcon />*/}
-				{/*											Edit*/}
-				{/*										</button>*/}
-				{/*										<DeleteProductButton product={product} />*/}
-				{/*									</div>*/}
-				{/*								)}*/}
-				{/*							</div>*/}
-				{/*							<div*/}
-				{/*								className={*/}
-				{/*									"flex  min-w-16 font-semibold text-xl list-col-grow justify-center"*/}
-				{/*								}*/}
-				{/*							>*/}
-				{/*								${product.price}*/}
-				{/*							</div>*/}
-				{/*						</div>*/}
-				{/*					</li>*/}
-				{/*				))*/}
-				{/*			)}*/}
-				{/*		</ul>*/}
-
-				{/*		<Pagination*/}
-				{/*			page={page}*/}
-				{/*			pageSize={pageSize}*/}
-				{/*			changeSelectedPageSize={changeSelectedPageSize}*/}
-				{/*			changeSelectedPage={changeSelectedPage}*/}
-				{/*			total={productsQuery.data.total}*/}
-				{/*		/>*/}
-				{/*	</div>*/}
-				{/*) : (*/}
-				{/*	<div>Invalid parameters</div>*/}
-				{/*)}*/}
 			</div>
 		);
 	}

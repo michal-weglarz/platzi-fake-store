@@ -16,35 +16,10 @@ function PlusIcon() {
 function SearchIcon() {
 	return (
 		<svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-			<g
-				strokeLinejoin="round"
-				strokeLinecap="round"
-				strokeWidth="2.5"
-				fill="none"
-				stroke="currentColor"
-			>
+			<g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2.5" fill="none" stroke="currentColor">
 				<circle cx="11" cy="11" r="8"></circle>
 				<path d="m21 21-4.3-4.3"></path>
 			</g>
-		</svg>
-	);
-}
-
-function BackArrowIcon() {
-	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			fill="none"
-			viewBox="0 0 24 24"
-			strokeWidth={1.5}
-			stroke="currentColor"
-			className="size-6"
-		>
-			<path
-				strokeLinecap="round"
-				strokeLinejoin="round"
-				d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-			/>
 		</svg>
 	);
 }
@@ -127,11 +102,7 @@ function DoubleChevronRightIcon() {
 			stroke="currentColor"
 			className="size-5"
 		>
-			<path
-				strokeLinecap="round"
-				strokeLinejoin="round"
-				d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5"
-			/>
+			<path strokeLinecap="round" strokeLinejoin="round" d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5" />
 		</svg>
 	);
 }
@@ -146,11 +117,7 @@ function DoubleChevronLeftIcon() {
 			stroke="currentColor"
 			className="size-5"
 		>
-			<path
-				strokeLinecap="round"
-				strokeLinejoin="round"
-				d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5"
-			/>
+			<path strokeLinecap="round" strokeLinejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
 		</svg>
 	);
 }
@@ -170,10 +137,30 @@ function EyeIcon() {
 				strokeLinejoin="round"
 				d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
 			/>
+			<path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+		</svg>
+	);
+}
+
+function ArrowUpIcon() {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-4">
 			<path
-				strokeLinecap="round"
-				strokeLinejoin="round"
-				d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+				fillRule="evenodd"
+				d="M10 17a.75.75 0 0 1-.75-.75V5.612L5.29 9.77a.75.75 0 0 1-1.08-1.04l5.25-5.5a.75.75 0 0 1 1.08 0l5.25 5.5a.75.75 0 1 1-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0 1 10 17Z"
+				clipRule="evenodd"
+			/>
+		</svg>
+	);
+}
+
+function ArrowDownIcon() {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-4">
+			<path
+				fillRule="evenodd"
+				d="M10 3a.75.75 0 0 1 .75.75v10.638l3.96-4.158a.75.75 0 1 1 1.08 1.04l-5.25 5.5a.75.75 0 0 1-1.08 0l-5.25-5.5a.75.75 0 1 1 1.08-1.04l3.96 4.158V3.75A.75.75 0 0 1 10 3Z"
+				clipRule="evenodd"
 			/>
 		</svg>
 	);
@@ -182,7 +169,6 @@ function EyeIcon() {
 export {
 	PlusIcon,
 	SearchIcon,
-	BackArrowIcon,
 	EditIcon,
 	DeleteIcon,
 	ChevronRightIcon,
@@ -190,4 +176,6 @@ export {
 	DoubleChevronLeftIcon,
 	DoubleChevronRightIcon,
 	EyeIcon,
+	ArrowUpIcon,
+	ArrowDownIcon,
 };
