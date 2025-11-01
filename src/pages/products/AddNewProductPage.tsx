@@ -1,11 +1,12 @@
 import { Link, useLocation } from "wouter";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../../utils/api.ts";
 import type { ChangeEvent } from "react";
 import { toast } from "react-toastify";
 
 function AddNewProductPage() {
 	const [, navigate] = useLocation();
+	const queryClient = useQueryClient();
 
 	const categoriesQuery = useQuery({
 		queryKey: ["categories"],
@@ -18,6 +19,7 @@ function AddNewProductPage() {
 		mutationFn: api.products.create,
 		onSuccess: (data) => {
 			toast.success(`A new product "${data.title}" has been added!`);
+			queryClient.invalidateQueries({ queryKey: ["products"], exact: false });
 			navigate("/products");
 		},
 		onError: () => {
@@ -110,8 +112,15 @@ function AddNewProductPage() {
 					</fieldset>
 				</div>
 
-				<button type={"submit"} className={"btn btn-neutral w-fit mt-4"}>
-					Create
+				<button type={"submit"} className={"btn btn-neutral w-fit mt-4"} disabled={mutation.isPending}>
+					{mutation.isPending ? (
+						<>
+							<span className="loading loading-spinner"></span>
+							Adding...
+						</>
+					) : (
+						"Add"
+					)}
 				</button>
 			</form>
 		</div>
