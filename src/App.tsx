@@ -7,7 +7,7 @@ import PageLoading from "./components/PageLoading.tsx";
 import { AuthProvider } from "./components/AuthContext.tsx";
 import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
-import NotFoundPage from "./components/404Page.tsx";
+import NotFoundPage from "./components/NotFoundPage.tsx";
 
 const LoginPage = lazy(() => import("./pages/login/LoginPage.tsx"));
 const ProductsPage = lazy(() => import("./pages/products/ProductsPage.tsx"));
