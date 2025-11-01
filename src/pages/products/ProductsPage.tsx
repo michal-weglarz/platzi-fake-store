@@ -242,22 +242,32 @@ function ProductsPage() {
 		const areParamsValid = pageSize > 0 && page > 0;
 
 		return (
-			<div className={"flex flex-col gap-8 items-end"}>
-				<div className="flex flex-col-reverse md:flex-row justify-between w-full items-start md:items-center">
-					<h1 className="text-xl font-bold tracking-wide self-start">Products</h1>
-					<div className="breadcrumbs text-sm">
-						<ul>
-							<li>
-								<Link to={"/"}>Home</Link>
-							</li>
-							<li>Products</li>
-						</ul>
+			<div className={"flex flex-col gap-6 items-end"}>
+				<div className="flex flex-col md:flex-row justify-between w-full gap-4 md:items-end">
+					<div className="flex flex-col gap-2">
+						<div className="breadcrumbs text-sm pb-0">
+							<ul>
+								<li>
+									<Link to={"/"}>Home</Link>
+								</li>
+								<li>Products</li>
+							</ul>
+						</div>
+						<h1 className="text-xl font-bold tracking-wide self-start">Products</h1>
 					</div>
+					{auth.user != null && (
+						<div className={"flex"}>
+							<Link to={"/products/new"} className={"btn btn-neutral btn-sm max-md:w-full"}>
+								<PlusIcon />
+								<span>Add new product</span>
+							</Link>
+						</div>
+					)}
 				</div>
 
 				<div className="card bg-base-100 w-full shadow-sm">
 					<div className={"flex flex-col-reverse md:flex-row gap-4 sm:justify-between items-center"}>
-						<div className={"flex flex-col md:flex-row gap-3 p-4 sm:justify-between flex-5/6 w-full"}>
+						<div className={"flex flex-col md:flex-row gap-3 p-4 sm:justify-between w-full"}>
 							<label className="input input-sm w-full floating-label">
 								<SearchIcon />
 								<input
@@ -316,16 +326,6 @@ function ProductsPage() {
 								<span className={"visible sm:hidden"}>filters</span>
 							</button>
 						</div>
-
-						{auth.user != null && (
-							<div className={"flex max-md:w-full flex-1/6 justify-end px-4 max-sm:pt-4"}>
-								<Link to={"/products/new"} className={"btn btn-neutral btn-sm max-md:w-full"}>
-									<PlusIcon />
-									<span>Add new</span>
-									<span className={"visible md:hidden"}>product</span>
-								</Link>
-							</div>
-						)}
 					</div>
 
 					<div className="card-body">
@@ -469,8 +469,7 @@ function ProductsPage() {
 		);
 	}
 
-	// Default return if no empty.
-	return "empty";
+	return <PageError />;
 }
 
 export default ProductsPage;

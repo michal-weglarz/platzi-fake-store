@@ -14,7 +14,7 @@ function Navbar() {
 					Platzi Fake Store
 				</Link>
 			</div>
-			<ul className="menu menu-horizontal px-1 flex flex-row justify-between items-center gap-2">
+			<ul className="menu menu-horizontal px-4 flex flex-row justify-between items-center gap-2">
 				<li>
 					<Link to={"/products"}>Products</Link>
 				</li>
@@ -44,7 +44,7 @@ function Navbar() {
 									api.auth.logout(queryClient);
 								}}
 							>
-								Logout
+								Log out
 							</button>
 						</li>
 					</ul>

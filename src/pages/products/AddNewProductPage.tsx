@@ -47,9 +47,8 @@ function AddNewProductPage() {
 
 	return (
 		<div className={"flex flex-col gap-8 items-end"}>
-			<div className="flex flex-col-reverse md:flex-row justify-between w-full items-stsart md:items-center">
-				<h1 className="text-xl font-bold tracking-wide self-start">Add product</h1>
-				<div className="breadcrumbs text-sm">
+			<div className="flex flex-col gap-2 w-full items-start ">
+				<div className="breadcrumbs text-sm pb-0">
 					<ul>
 						<li>
 							<Link to={"/"}>Home</Link>
@@ -57,9 +56,10 @@ function AddNewProductPage() {
 						<li>
 							<Link to={"/products"}>Products</Link>
 						</li>
-						<li>Add Product</li>
+						<li>Add product</li>
 					</ul>
 				</div>
+				<h1 className="text-xl font-bold tracking-wide self-start">Add product</h1>
 			</div>
 
 			<form className={"flex flex-col w-full"} onSubmit={createNewProduct}>

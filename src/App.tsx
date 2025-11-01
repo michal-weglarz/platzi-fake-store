@@ -7,6 +7,7 @@ import PageLoading from "./components/PageLoading.tsx";
 import { AuthProvider } from "./components/AuthContext.tsx";
 import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
+import NotFoundPage from "./components/404Page.tsx";
 
 const LoginPage = lazy(() => import("./pages/login/LoginPage.tsx"));
 const ProductsPage = lazy(() => import("./pages/products/ProductsPage.tsx"));
@@ -47,7 +48,9 @@ function App() {
 						<Route path="/products/new" />
 						<Route path="/products/:id/" />
 						<Route path="/products/:id/edit" />
-						<Route>404: No such page!</Route>
+						<Route>
+							<NotFoundPage />
+						</Route>
 					</Switch>
 				</main>
 				<ToastContainer position="bottom-left" />
