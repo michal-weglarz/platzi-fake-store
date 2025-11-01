@@ -12,6 +12,7 @@ interface Props {
 	changeSelectedPageSize: (event: ChangeEvent<HTMLSelectElement>) => void;
 	changeSelectedPage: (page: number) => void;
 	total: number;
+	productsOnPage: number;
 }
 
 function Pagination(props: Props) {
@@ -68,7 +69,7 @@ function Pagination(props: Props) {
 
 			<div className="join gap-2">
 				<button
-					disabled={props.total === 0}
+					disabled={props.productsOnPage === 0}
 					className={"btn btn-square btn-xs"}
 					onClick={() => {
 						props.changeSelectedPage(1);
@@ -77,7 +78,7 @@ function Pagination(props: Props) {
 					<DoubleChevronLeftIcon />
 				</button>
 				<button
-					disabled={props.total === 0}
+					disabled={props.productsOnPage === 0}
 					className={"btn btn-square btn-xs"}
 					onClick={() => updateSelectedPage(props.page - 1)}
 				>
@@ -85,7 +86,7 @@ function Pagination(props: Props) {
 				</button>
 				<div className="flex flex-row gap-1 justify-center items-center">
 					<input
-						disabled={props.total === 0}
+						disabled={props.productsOnPage === 0}
 						className={"input input-xs w-[50px]"}
 						type={"number"}
 						min={"1"}
@@ -96,14 +97,14 @@ function Pagination(props: Props) {
 					<p className={"text-sm font-light"}>of {numberOfPages}</p>
 				</div>
 				<button
-					disabled={props.total === 0}
+					disabled={props.productsOnPage === 0}
 					className={"btn btn-square btn-xs"}
 					onClick={() => updateSelectedPage(props.page + 1)}
 				>
 					<ChevronRightIcon />
 				</button>
 				<button
-					disabled={props.total === 0}
+					disabled={props.productsOnPage === 0}
 					className={"btn btn-square btn-xs"}
 					onClick={() => {
 						props.changeSelectedPage(numberOfPages);

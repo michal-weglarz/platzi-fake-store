@@ -27,8 +27,7 @@ function ProductsPage() {
 	const productsQuery = useQuery({
 		queryKey: ["products", page, pageSize, title, category, priceMin, priceMax].filter(Boolean),
 		queryFn: async () => {
-			const offset = Math.max((page - 1) * pageSize, 0);
-			console.log("offset", offset);
+			const offset = Math.max((page - 1) * pageSize, 0); // in case `page` is negative
 			const [all, paginated] = await Promise.all([
 				// All products for total count used in pagination
 				api.products.getAll({
@@ -115,7 +114,6 @@ function ProductsPage() {
 
 	const changeSelectedCategory = (event: ChangeEvent<HTMLSelectElement>) => {
 		const value = event.target.value;
-		console.log(value);
 		if (value.length === 0) {
 			setSearchParams((prev) => {
 				prev.delete("category");
@@ -188,6 +186,18 @@ function ProductsPage() {
 			prev.delete("priceMax");
 			return prev;
 		});
+
+		// I'm using an imperative approach with the pure JavaScript API, because I find it easier to reset the following
+		// inputs' values like this, instead of making the inputs controlled by React and dealing with synchronization of
+		// the local state to the url params.
+		// Search, Min price and Max price trigger URL changes either in the debounced manner or on blur—I can't simply
+		// use `value={searchParams.get("title")}` like I did with the category filter.
+		const search: HTMLInputElement | null = document.querySelector("#search");
+		const minPrice: HTMLInputElement | null = document.querySelector("#min-price");
+		const maxPrice: HTMLInputElement | null = document.querySelector("#max-price");
+		if (search) search.value = "";
+		if (minPrice) minPrice.value = "";
+		if (maxPrice) maxPrice.value = "";
 	};
 
 	const debounceSearchChange = debounce(onSearchChange, 300);
@@ -250,6 +260,7 @@ function ProductsPage() {
 							<label className="input input-sm w-full floating-label">
 								<SearchIcon />
 								<input
+									id={"search"}
 									type="search"
 									placeholder="Search title"
 									defaultValue={title ?? ""}
@@ -277,6 +288,7 @@ function ProductsPage() {
 							<div className={"flex flex-row gap-1 w-full"}>
 								<label className="input input-sm floating-label w-full">
 									<input
+										id={"min-price"}
 										type="number"
 										min="1"
 										placeholder="Min price"
@@ -287,6 +299,7 @@ function ProductsPage() {
 								</label>
 								<label className="input input-sm floating-label w-full">
 									<input
+										id={"max-price"}
 										type="number"
 										min="1"
 										placeholder="Max price"
@@ -439,6 +452,7 @@ function ProductsPage() {
 													changeSelectedPageSize={changeSelectedPageSize}
 													changeSelectedPage={changeSelectedPage}
 													total={productsQuery.data.total}
+													productsOnPage={productsQuery.data.products.length}
 												/>
 											</td>
 										</tr>
