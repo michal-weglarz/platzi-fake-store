@@ -115,7 +115,14 @@ function ProductsPage() {
 
 	const changeSelectedCategory = (event: ChangeEvent<HTMLSelectElement>) => {
 		const value = event.target.value;
-
+		console.log(value);
+		if (value.length === 0) {
+			setSearchParams((prev) => {
+				prev.delete("category");
+				return prev;
+			});
+			return;
+		}
 		setSearchParams((prev) => {
 			prev.set("page", "1");
 			prev.set("category", value);
@@ -125,6 +132,13 @@ function ProductsPage() {
 
 	const onSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const value = event.target.value;
+		if (value.length === 0) {
+			setSearchParams((prev) => {
+				prev.delete("title");
+				return prev;
+			});
+			return;
+		}
 
 		setSearchParams((prev) => {
 			prev.set("page", "1");
@@ -135,8 +149,13 @@ function ProductsPage() {
 
 	const updatePriceMin = (event: ChangeEvent<HTMLInputElement>) => {
 		const value = event.target.value;
-		if (parseInt(value) < 0) return;
-
+		if (value.length === 0) {
+			setSearchParams((prev) => {
+				prev.delete("priceMin");
+				return prev;
+			});
+			return;
+		}
 		setSearchParams((prev) => {
 			prev.set("page", "1");
 			prev.set("priceMin", value);
@@ -146,7 +165,13 @@ function ProductsPage() {
 
 	const updatePriceMax = (event: ChangeEvent<HTMLInputElement>) => {
 		const value = event.target.value;
-		if (parseInt(value) < 0) return;
+		if (value === "" || parseInt(value) < 0) {
+			setSearchParams((prev) => {
+				prev.delete("priceMax");
+				return prev;
+			});
+			return;
+		}
 
 		setSearchParams((prev) => {
 			prev.set("page", "1");
@@ -207,7 +232,7 @@ function ProductsPage() {
 
 		return (
 			<div className={"flex flex-col gap-8 items-end"}>
-				<div className="flex row justify-between w-full items-center">
+				<div className="flex flex-col-reverse md:flex-row justify-between w-full items-start md:items-center">
 					<h1 className="text-xl font-bold tracking-wide self-start">Products</h1>
 					<div className="breadcrumbs text-sm">
 						<ul>

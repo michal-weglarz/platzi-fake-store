@@ -47,7 +47,7 @@ function AddNewProductPage() {
 
 	return (
 		<div className={"flex flex-col gap-8 items-end"}>
-			<div className="flex row justify-between w-full items-center">
+			<div className="flex flex-col-reverse md:flex-row justify-between w-full items-stsart md:items-center">
 				<h1 className="text-xl font-bold tracking-wide self-start">Add product</h1>
 				<div className="breadcrumbs text-sm">
 					<ul>
@@ -65,13 +65,7 @@ function AddNewProductPage() {
 			<form className={"flex flex-col w-full"} onSubmit={createNewProduct}>
 				<fieldset className={"fieldset flex-1"}>
 					<legend className="fieldset-legend">Title</legend>
-					<input
-						type="text"
-						name={"title"}
-						placeholder="Title"
-						className={"input w-full"}
-						required
-					/>
+					<input type="text" name={"title"} placeholder="Title" className={"input w-full"} required />
 				</fieldset>
 
 				<fieldset className={"fieldset flex-1 "}>
