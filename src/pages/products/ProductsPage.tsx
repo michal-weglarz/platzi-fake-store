@@ -4,12 +4,14 @@ import { Link, useSearchParams } from "wouter";
 import Pagination from "./Pagination.tsx";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_BY } from "../../utils/consts.ts";
 import type { Product, SortBy } from "../../utils/types.ts";
-import { ArrowDownIcon, ArrowUpIcon, EditIcon, EyeIcon, PlusIcon, SearchIcon } from "../../components/Icons.tsx";
+import { ArrowDownIcon, ArrowUpIcon, EditIcon, EyeIcon, SearchIcon } from "../../components/Icons.tsx";
 import { debounce } from "../../utils/utils.ts";
 import api from "../../utils/api.ts";
 import { useAuth } from "../../utils/useAuth.ts";
 import DeleteProductButton from "./DeleteProductButton.tsx";
 import PageError from "../../components/PageError.tsx";
+import ProductsLoadingSkeleton from "./ProductsLoadingSkeleton.tsx";
+import PageHeader from "./PageHeader.tsx";
 
 function ProductsPage() {
 	const auth = useAuth();
@@ -120,13 +122,13 @@ function ProductsPage() {
 				prev.delete("category");
 				return prev;
 			});
-			return;
+		} else {
+			setSearchParams((prev) => {
+				prev.set("page", "1");
+				prev.set("category", value);
+				return prev;
+			});
 		}
-		setSearchParams((prev) => {
-			prev.set("page", "1");
-			prev.set("category", value);
-			return prev;
-		});
 	};
 
 	const onSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -136,14 +138,13 @@ function ProductsPage() {
 				prev.delete("title");
 				return prev;
 			});
-			return;
+		} else {
+			setSearchParams((prev) => {
+				prev.set("page", "1");
+				prev.set("title", value);
+				return prev;
+			});
 		}
-
-		setSearchParams((prev) => {
-			prev.set("page", "1");
-			prev.set("title", value);
-			return prev;
-		});
 	};
 
 	const updatePriceMin = (event: ChangeEvent<HTMLInputElement>) => {
@@ -153,13 +154,13 @@ function ProductsPage() {
 				prev.delete("priceMin");
 				return prev;
 			});
-			return;
+		} else {
+			setSearchParams((prev) => {
+				prev.set("page", "1");
+				prev.set("priceMin", value);
+				return prev;
+			});
 		}
-		setSearchParams((prev) => {
-			prev.set("page", "1");
-			prev.set("priceMin", value);
-			return prev;
-		});
 	};
 
 	const updatePriceMax = (event: ChangeEvent<HTMLInputElement>) => {
@@ -169,14 +170,13 @@ function ProductsPage() {
 				prev.delete("priceMax");
 				return prev;
 			});
-			return;
+		} else {
+			setSearchParams((prev) => {
+				prev.set("page", "1");
+				prev.set("priceMax", value);
+				return prev;
+			});
 		}
-
-		setSearchParams((prev) => {
-			prev.set("page", "1");
-			prev.set("priceMax", value);
-			return prev;
-		});
 	};
 
 	const resetFilters = () => {
@@ -192,7 +192,7 @@ function ProductsPage() {
 		// inputs' values like this, instead of making the inputs controlled by React and dealing with synchronization of
 		// the local state to the url params.
 		// Search, Min price and Max price trigger URL changes either in the debounced manner or on blur—I can't simply
-		// use `value={searchParams.get("title")}` like I did with the category filter.
+		// use `value={searchParams.get("title")}` like I did with the Category filter.
 		const search: HTMLInputElement | null = document.querySelector("#search");
 		const minPrice: HTMLInputElement | null = document.querySelector("#min-price");
 		const maxPrice: HTMLInputElement | null = document.querySelector("#max-price");
@@ -204,34 +204,7 @@ function ProductsPage() {
 	const debounceSearchChange = debounce(onSearchChange, 300);
 
 	if (isPageLoading) {
-		return (
-			<>
-				<h1 className="p-4 pb-2 text-3xl font-bold tracking-wide">Products</h1>
-				<ul className="list bg-base-100 rounded-box shadow-md">
-					<li className="list-row">
-						<div className="skeleton h-48 w-48"></div>
-						<div className={"flex flex-col gap-4"}>
-							<div className="skeleton h-4 w-64"></div>
-							<div className="skeleton h-8 w-full"></div>
-						</div>
-					</li>
-					<li className="list-row">
-						<div className="skeleton h-48 w-48"></div>
-						<div className={"flex flex-col gap-4"}>
-							<div className="skeleton h-4 w-64"></div>
-							<div className="skeleton h-8 w-full"></div>
-						</div>
-					</li>
-					<li className="list-row">
-						<div className="skeleton h-48 w-48"></div>
-						<div className={"flex flex-col gap-4"}>
-							<div className="skeleton h-4 w-64"></div>
-							<div className="skeleton h-8 w-full"></div>
-						</div>
-					</li>
-				</ul>
-			</>
-		);
+		return <ProductsLoadingSkeleton />;
 	}
 
 	if (isPageError) {
@@ -243,27 +216,7 @@ function ProductsPage() {
 
 		return (
 			<div className={"flex flex-col gap-6 items-end"}>
-				<div className="flex flex-col md:flex-row justify-between w-full gap-4 md:items-end">
-					<div className="flex flex-col gap-2">
-						<div className="breadcrumbs text-sm pb-0">
-							<ul>
-								<li>
-									<Link to={"/"}>Home</Link>
-								</li>
-								<li>Products</li>
-							</ul>
-						</div>
-						<h1 className="text-xl font-bold tracking-wide self-start">Products</h1>
-					</div>
-					{auth.user != null && (
-						<div className={"flex"}>
-							<Link to={"/products/new"} className={"btn btn-neutral btn-sm max-md:w-full"}>
-								<PlusIcon />
-								<span>Add new product</span>
-							</Link>
-						</div>
-					)}
-				</div>
+				<PageHeader />
 
 				<div className="card bg-base-100 w-full shadow-sm">
 					<div className={"flex flex-col-reverse md:flex-row gap-4 sm:justify-between items-center"}>
@@ -460,7 +413,7 @@ function ProductsPage() {
 									</tfoot>
 								</table>
 							) : (
-								<PageError message={"Invalid URL paramaters."} />
+								<PageError message={"Invalid URL parameters."} />
 							)}
 						</div>
 					</div>
