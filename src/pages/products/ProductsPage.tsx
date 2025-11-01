@@ -9,6 +9,7 @@ import { debounce } from "../../utils/utils.ts";
 import api from "../../utils/api.ts";
 import { useAuth } from "../../utils/useAuth.ts";
 import DeleteProductButton from "./DeleteProductButton.tsx";
+import PageError from "../../components/PageError.tsx";
 
 function ProductsPage() {
 	const auth = useAuth();
@@ -234,7 +235,7 @@ function ProductsPage() {
 	}
 
 	if (isPageError) {
-		return "error";
+		return <PageError message={"Couldn't load the requested resources."} />;
 	}
 
 	if (productsQuery.data && categoriesQuery.data) {
@@ -459,7 +460,7 @@ function ProductsPage() {
 									</tfoot>
 								</table>
 							) : (
-								<div>Invalid URL parameters</div>
+								<PageError message={"Invalid URL paramaters."} />
 							)}
 						</div>
 					</div>
