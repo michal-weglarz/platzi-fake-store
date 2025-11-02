@@ -42,7 +42,8 @@ function Navbar() {
 						<li>
 							<button
 								onClick={() => {
-									api.auth.logout(queryClient);
+									api.auth.logout();
+									queryClient.resetQueries({ queryKey: ["profile"] });
 								}}
 							>
 								Log out

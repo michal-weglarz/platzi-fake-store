@@ -12,8 +12,9 @@ function LoginPage() {
 	const mutation = useMutation({
 		mutationFn: api.auth.login,
 		onSuccess: async (data) => {
-			if (data.access_token) {
+			if (data.access_token && data.refresh_token) {
 				localStorage.setItem("access_token", data.access_token);
+				localStorage.setItem("refresh_token", data.refresh_token);
 			}
 			await queryClient.refetchQueries({ queryKey: ["profile"] });
 			const user = queryClient.getQueryData(["profile"]) as User;
@@ -47,22 +48,10 @@ function LoginPage() {
 						<legend className="fieldset-legend">Login</legend>
 
 						<label className="label">Email</label>
-						<input
-							type="email"
-							className="input"
-							placeholder="Email"
-							name={"email"}
-							required
-						/>
+						<input type="email" className="input" placeholder="Email" name={"email"} required />
 
 						<label className="label">Password</label>
-						<input
-							type="password"
-							className="input"
-							placeholder="Password"
-							name={"password"}
-							required
-						/>
+						<input type="password" className="input" placeholder="Password" name={"password"} required />
 
 						<button type="submit" className="btn btn-neutral mt-4">
 							{mutation.isPending ? "Logging in..." : "Login"}

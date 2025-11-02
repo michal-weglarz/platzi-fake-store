@@ -73,6 +73,10 @@ export interface AuthResponse {
 	refresh_token: string;
 }
 
+export interface RefreshTokenRequest {
+	refresh_token: string;
+}
+
 export interface AuthContextType {
 	user?: User | null;
 }

@@ -24,3 +24,29 @@ export function getRelativeTime(isoString: string) {
 	if (seconds < 31536000) return `${Math.floor(seconds / 2592000)} months ago`;
 	return `${Math.floor(seconds / 31536000)} years ago`;
 }
+
+export function decodeJWT(token: string) {
+	try {
+		const base64Url = token.split(".")[1];
+		const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+		const jsonPayload = decodeURIComponent(
+			atob(base64)
+				.split("")
+				.map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+				.join("")
+		);
+		return JSON.parse(jsonPayload) as Record<string, any>;
+	} catch {
+		return null;
+	}
+}
+
+export function isTokenExpiringSoon(token: string, bufferSeconds = 60) {
+	const decoded = decodeJWT(token);
+	if (decoded?.exp == null) return false;
+
+	const now = Math.floor(Date.now() / 1000);
+	const expiresIn = decoded.exp - now;
+
+	return expiresIn <= bufferSeconds;
+}

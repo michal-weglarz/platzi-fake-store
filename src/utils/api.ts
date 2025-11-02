@@ -7,10 +7,10 @@ import type {
 	LoginCredentials,
 	Product,
 	ProductsQueryParams,
+	RefreshTokenRequest,
 	UpdateProductData,
 	User,
 } from "./types.ts";
-import type { QueryClient } from "@tanstack/react-query";
 
 const apiConfig = axios.create({
 	baseURL: "https://api.escuelajs.co/api/v1/",
@@ -33,11 +33,30 @@ apiConfig.interceptors.response.use(
 	(response) => {
 		return response;
 	},
-	(error) => {
-		if (error.response && error.response.status === 401) {
-			localStorage.removeItem("access_token");
-		}
+	async (error) => {
+		const originalRequest = error.config;
+		if (error.response?.status === 401 && !originalRequest._retry) {
+			originalRequest._retry = true;
+			try {
+				const refreshToken = localStorage.getItem("refresh_token");
+				if (!refreshToken) {
+					throw new Error("Refresh token is missing");
+				}
 
+				const response = await api.auth.refresh({ refresh_token: refreshToken });
+
+				localStorage.setItem("access_token", response.access_token);
+				localStorage.setItem("refresh_token", response.refresh_token);
+
+				apiConfig.defaults.headers.Authorization = `Bearer ${response.access_token}`;
+				return apiConfig(originalRequest); // Retry the original request with the new access token.
+			} catch (error) {
+				console.error("Token refresh failed:", error);
+				localStorage.removeItem("access_token");
+				localStorage.removeItem("refresh_token");
+				return Promise.reject(error);
+			}
+		}
 		return Promise.reject(error);
 	}
 );
@@ -94,13 +113,17 @@ const api = {
 			return response.data;
 		},
 
-		logout: async (queryClient?: QueryClient) => {
+		logout: async () => {
 			localStorage.removeItem("access_token");
-			queryClient?.resetQueries({ queryKey: ["profile"] });
 		},
 
 		getProfile: async () => {
 			const response = await apiConfig.get<User>(`/auth/profile`);
+			return response.data;
+		},
+
+		refresh: async (data: RefreshTokenRequest) => {
+			const response = await apiConfig.post<AuthResponse>(`/auth/refresh`, data);
 			return response.data;
 		},
 	},
