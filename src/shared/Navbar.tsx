@@ -36,11 +36,16 @@ function Navbar() {
 						tabIndex={-1}
 						className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
 					>
-						<li>
-							<a>Profile</a>
-						</li>
+						<div className="p-2 flex flex-col gap-2">
+							<p className={"uppercase text-xs badge-xs badge-soft badge-secondary badge"}>
+								{auth.user.role} #{auth.user.id}
+							</p>
+							<p className={"font-bold"}>{auth.user.name}</p>
+							<p className={"text-xs text-slate-600"}>{auth.user.email}</p>
+						</div>
 						<li>
 							<button
+								className={"btn btn-neutral btn-block btn-sm"}
 								onClick={() => {
 									api.auth.logout();
 									queryClient.resetQueries({ queryKey: ["profile"] });
