@@ -1,18 +1,18 @@
 import { Route, Switch } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Navbar from "./components/Navbar.tsx";
+import Navbar from "./shared/Navbar.tsx";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { lazy, Suspense } from "react";
-import PageLoading from "./components/PageLoading.tsx";
-import { AuthProvider } from "./components/AuthContext.tsx";
+import PageLoading from "./shared/PageLoading.tsx";
+import { AuthProvider } from "./shared/AuthContext.tsx";
 import { ToastContainer } from "react-toastify";
-import ProtectedRoute from "./components/ProtectedRoute.tsx";
-import NotFoundPage from "./components/NotFoundPage.tsx";
+import ProtectedRoute from "./shared/ProtectedRoute.tsx";
+import NotFoundPage from "./shared/NotFoundPage.tsx";
 
-const LoginPage = lazy(() => import("./pages/login/LoginPage.tsx"));
-const ProductsPage = lazy(() => import("./pages/products/ProductsPage.tsx"));
-const ProductFormPage = lazy(() => import("./pages/products/./ProductFormPage"));
-const ProductDetailsPage = lazy(() => import("./pages/products/ProductDetailsPage.tsx"));
+const LoginPage = lazy(() => import("./features/login/LoginPage.tsx"));
+const ProductsPage = lazy(() => import("./features/products/ProductsPage.tsx"));
+const ProductFormPage = lazy(() => import("./features/products/./ProductFormPage"));
+const ProductDetailsPage = lazy(() => import("./features/products/ProductDetailsPage.tsx"));
 
 const queryClient = new QueryClient();
 

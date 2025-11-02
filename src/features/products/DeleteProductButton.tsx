@@ -1,4 +1,4 @@
-import { DeleteIcon } from "../../components/Icons.tsx";
+import { DeleteIcon } from "../../shared/Icons.tsx";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../../utils/api.ts";
 import { toast } from "react-toastify";

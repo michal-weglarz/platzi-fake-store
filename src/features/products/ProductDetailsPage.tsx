@@ -2,9 +2,9 @@ import { Link, useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import api from "../../utils/api.ts";
 import PageHeader from "./PageHeader.tsx";
-import PageLoading from "../../components/PageLoading.tsx";
-import PageError from "../../components/PageError.tsx";
-import { EditIcon } from "../../components/Icons.tsx";
+import PageLoading from "../../shared/PageLoading.tsx";
+import PageError from "../../shared/PageError.tsx";
+import { EditIcon } from "../../shared/Icons.tsx";
 import { useAuth } from "../../utils/useAuth.ts";
 
 function ProductDetailsPage() {

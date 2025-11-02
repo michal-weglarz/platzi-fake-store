@@ -4,7 +4,7 @@ import api from "../../utils/api.ts";
 import { type ChangeEvent } from "react";
 import { toast } from "react-toastify";
 import PageHeader from "./PageHeader.tsx";
-import PageError from "../../components/PageError.tsx";
+import PageError from "../../shared/PageError.tsx";
 import type { UpdateProductData } from "../../utils/types.ts";
 import ProductFormLoadingSkeleton from "./ProductFormLoadingSkeleton.tsx";
 

@@ -4,7 +4,7 @@ import {
 	ChevronRightIcon,
 	DoubleChevronLeftIcon,
 	DoubleChevronRightIcon,
-} from "../../components/Icons.tsx";
+} from "../../shared/Icons.tsx";
 
 interface Props {
 	page: number;

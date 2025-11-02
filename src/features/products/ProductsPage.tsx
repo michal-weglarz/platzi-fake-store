@@ -4,12 +4,12 @@ import { Link, useSearchParams } from "wouter";
 import Pagination from "./Pagination.tsx";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_BY } from "../../utils/consts.ts";
 import type { Product, SortBy } from "../../utils/types.ts";
-import { ArrowDownIcon, ArrowUpIcon, EditIcon, EyeIcon, PlusIcon, SearchIcon } from "../../components/Icons.tsx";
+import { ArrowDownIcon, ArrowUpIcon, EditIcon, EyeIcon, PlusIcon, SearchIcon } from "../../shared/Icons.tsx";
 import { debounce } from "../../utils/utils.ts";
 import api from "../../utils/api.ts";
 import { useAuth } from "../../utils/useAuth.ts";
 import DeleteProductButton from "./DeleteProductButton.tsx";
-import PageError from "../../components/PageError.tsx";
+import PageError from "../../shared/PageError.tsx";
 import ProductsLoadingSkeleton from "./ProductsLoadingSkeleton.tsx";
 import PageHeader from "./PageHeader.tsx";
 
