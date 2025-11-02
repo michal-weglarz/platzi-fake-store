@@ -1,4 +1,4 @@
-import { Route, Switch } from "wouter";
+import { Redirect, Route, Switch } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Navbar from "./shared/Navbar.tsx";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -23,6 +23,9 @@ function App() {
 				<Navbar />
 				<main className="max-w-6xl mx-auto pt-24 px-4 pb-20 bg-slate-50">
 					<Switch>
+						<Route path={"/"}>
+							<Redirect to={"/products"} />
+						</Route>
 						<Route path="/login">
 							<Suspense fallback={<PageLoading />}>
 								<LoginPage />
