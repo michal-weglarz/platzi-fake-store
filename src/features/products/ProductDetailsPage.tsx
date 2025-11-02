@@ -122,15 +122,17 @@ function ProductDetailsPage() {
 									{getRelativeTime(productQuery.data.creationAt)}
 								</div>
 							</div>
-							<div
-								className={"tooltip w-fit"}
-								data-tip={new Date(productQuery.data.updatedAt).toLocaleString()}
-							>
-								<div className="text-base-content/60">
-									<span className="font-medium">Updated:</span>{" "}
-									{getRelativeTime(productQuery.data.updatedAt)}
+							{productQuery.data.creationAt !== productQuery.data.updatedAt && (
+								<div
+									className={"tooltip w-fit"}
+									data-tip={new Date(productQuery.data.updatedAt).toLocaleString()}
+								>
+									<div className="text-base-content/60">
+										<span className="font-medium">Updated:</span>{" "}
+										{getRelativeTime(productQuery.data.updatedAt)}
+									</div>
 								</div>
-							</div>
+							)}
 						</div>
 
 						{auth.user != null && (
