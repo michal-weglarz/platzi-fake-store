@@ -75,3 +75,9 @@ export interface AuthResponse {
 export interface AuthContextType {
 	user?: User | null;
 }
+
+export interface FileUploadResponse {
+	filename: string;
+	location: string;
+	originalname: string;
+}

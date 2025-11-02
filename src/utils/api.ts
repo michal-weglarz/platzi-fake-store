@@ -3,6 +3,7 @@ import type {
 	AuthResponse,
 	Category,
 	CreateProductData,
+	FileUploadResponse,
 	LoginCredentials,
 	Product,
 	ProductsQueryParams,
@@ -101,6 +102,24 @@ const api = {
 		getProfile: async () => {
 			const response = await apiConfig.get<User>(`/auth/profile`);
 			return response.data;
+		},
+	},
+
+	// Files endpoints
+	files: {
+		uploadMultiple: async (files: File[]) => {
+			const uploadPromises = files.map((file) => {
+				const formData = new FormData();
+				formData.append("file", file);
+				return apiConfig.post<FileUploadResponse>("/files/upload", formData, {
+					headers: {
+						"Content-Type": "multipart/form-data",
+					},
+				});
+			});
+
+			const responses = await Promise.all(uploadPromises);
+			return responses.map((res) => res.data);
 		},
 	},
 };

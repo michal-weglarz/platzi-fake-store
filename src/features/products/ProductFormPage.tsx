@@ -1,12 +1,13 @@
 import { useLocation, useParams } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../../utils/api.ts";
-import { type ChangeEvent } from "react";
+import { type ChangeEvent, useState } from "react";
 import { toast } from "react-toastify";
 import PageHeader from "./PageHeader.tsx";
 import PageError from "../../shared/PageError.tsx";
-import type { UpdateProductData } from "../../utils/types.ts";
+import type { FileUploadResponse, UpdateProductData } from "../../utils/types.ts";
 import ProductFormLoadingSkeleton from "./ProductFormLoadingSkeleton.tsx";
+import FileUpload from "./FileUpload.tsx";
 
 function ProductFormPage() {
 	const [, navigate] = useLocation();
@@ -30,7 +31,17 @@ function ProductFormPage() {
 			}
 			return null;
 		},
+		// In a scenario where I edit a product, go to the products list and then immediately go back to the edit page,
+		// I want to make sure the query is invalidated and I always get to see the latest results.
+		staleTime: 0,
+		gcTime: 0,
 	});
+
+	const productQueryImages = productQuery.data
+		? productQuery.data.images.map((img) => ({ filename: img, location: img, originalname: img }))
+		: [];
+	const [uploadedImages, setUploadedImages] = useState<FileUploadResponse[]>(productQueryImages);
+	const [isAddingImages, setIsAddingImages] = useState(false);
 
 	const createMutation = useMutation({
 		mutationFn: api.products.create,
@@ -70,26 +81,24 @@ function ProductFormPage() {
 				id: productId,
 				data: {} as UpdateProductData,
 			};
-
 			if (title) params.data["title"] = title as string;
 			if (description) params.data["description"] = description as string;
 			if (price) params.data["price"] = parseInt(price as string);
 			if (categoryId) params.data["categoryId"] = parseInt(categoryId as string);
-
+			if (uploadedImages.length > 0) params.data["images"] = uploadedImages.map((image) => image.location);
 			editMutation.mutate(params);
-			return;
-		}
-
-		if (title && description && price && categoryId) {
-			createMutation.mutate({
-				title: title as string,
-				description: description as string,
-				categoryId: parseInt(categoryId as string),
-				price: parseInt(price as string),
-				images: ["https://placehold.co/600x400"],
-			});
 		} else {
-			toast.error("Missing required fields!");
+			if (title && description && price && categoryId) {
+				createMutation.mutate({
+					title: title as string,
+					description: description as string,
+					categoryId: parseInt(categoryId as string),
+					price: parseInt(price as string),
+					images: uploadedImages.map((image) => image.location),
+				});
+			} else {
+				toast.error("Missing required fields!");
+			}
 		}
 	};
 
@@ -122,7 +131,7 @@ function ProductFormPage() {
 							placeholder="Title"
 							className={"input w-full"}
 							defaultValue={productQuery.data?.title}
-							required
+							required={!isInEditMode}
 						/>
 					</fieldset>
 
@@ -132,7 +141,7 @@ function ProductFormPage() {
 							className="textarea w-full"
 							placeholder="Description"
 							defaultValue={productQuery.data?.description}
-							required
+							required={!isInEditMode}
 							name="description"
 						></textarea>
 					</fieldset>
@@ -142,7 +151,7 @@ function ProductFormPage() {
 							<legend className="fieldset-legend">Category</legend>
 							<select
 								className="select w-full"
-								required
+								required={!isInEditMode}
 								defaultValue={productQuery.data?.category.id}
 								name={"categoryId"}
 							>
@@ -169,16 +178,23 @@ function ProductFormPage() {
 								placeholder="Price"
 								className={"input w-full"}
 								defaultValue={productQuery.data?.price}
-								required
+								required={!isInEditMode}
 								name="price"
 							/>
 						</fieldset>
 					</div>
 
+					<FileUpload
+						isInEditMode={isInEditMode}
+						uploadedImages={uploadedImages}
+						setUploadedImages={setUploadedImages}
+						setIsAddingImages={setIsAddingImages}
+					/>
+
 					<button
 						type={"submit"}
-						className={"btn btn-neutral w-fit mt-4"}
-						disabled={createMutation.isPending || editMutation.isPending}
+						className={"btn btn-neutral w-fit mt-8"}
+						disabled={createMutation.isPending || editMutation.isPending || isAddingImages}
 					>
 						{createMutation.isPending || editMutation.isPending ? (
 							<>

@@ -42,13 +42,16 @@ function ProductDetailsPage() {
 				title={""}
 			/>
 			<div className="card lg:card-side bg-base-100 shadow-sm">
-				<div className="carousel w-full ">
+				<div className="carousel w-full">
 					{productQuery.data.images.map((image, index) => (
-						<div id={index.toString()} key={image} className="carousel-item w-full relative">
+						<div id={index.toString()} key={image} className="carousel-item relative w-full">
 							<img
 								src={image}
-								className="object-cover"
+								className="w-full"
 								alt={`${productQuery.data?.title ?? ""} product image`}
+								onError={(e) => {
+									e.currentTarget.src = "https://placehold.co/400x400";
+								}}
 							/>
 							<div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
 								<a href={`#${Math.max(index - 1, 0)}`} className="btn btn-circle">
@@ -65,7 +68,7 @@ function ProductDetailsPage() {
 					))}
 				</div>
 
-				<div className="card-body">
+				<div className="card-body min-w-[800px]">
 					<span className="badge badge-xs badge-warning">{productQuery.data.category.name}</span>
 					<div className="flex justify-between">
 						<h2 className="text-3xl font-bold">{productQuery.data.title}</h2>

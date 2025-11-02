@@ -370,7 +370,14 @@ function ProductsPage() {
 												<div className="flex items-center gap-3">
 													<div className="avatar">
 														<div className="mask h-12 w-12">
-															<img src={product.images[0]} alt="Product image" />
+															<img
+																src={product.images[0]}
+																alt={`${product.title} product image`}
+																onError={(e) => {
+																	e.currentTarget.src =
+																		"https://placehold.co/400x400";
+																}}
+															/>
 														</div>
 													</div>
 													<div>
