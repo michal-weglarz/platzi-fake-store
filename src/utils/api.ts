@@ -50,7 +50,7 @@ const api = {
 			if (params?.categorySlug) searchParams.set("categorySlug", params.categorySlug);
 			if (params?.price_min) searchParams.set("price_min", params.price_min);
 			if (params?.price_max) searchParams.set("price_max", params.price_max);
-			if (params?.offset) searchParams.set("offset", params.offset.toString());
+			if (params?.offset != null) searchParams.set("offset", params.offset.toString());
 			if (params?.limit) searchParams.set("limit", params.limit.toString());
 
 			const response = await apiConfig.get(`/products?${searchParams.toString()}`);
