@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import PageHeader from "./PageHeader.tsx";
 import PageError from "../../components/PageError.tsx";
 import type { UpdateProductData } from "../../utils/types.ts";
-import ProductFormLoadingSkeleton from "./ProductFormLoadingSkeletong.tsx";
+import ProductFormLoadingSkeleton from "./ProductFormLoadingSkeleton.tsx";
 
 function ProductFormPage() {
 	const [, navigate] = useLocation();
@@ -77,7 +77,6 @@ function ProductFormPage() {
 			if (categoryId) params.data["categoryId"] = parseInt(categoryId as string);
 
 			editMutation.mutate(params);
-
 			return;
 		}
 
@@ -94,8 +93,8 @@ function ProductFormPage() {
 		}
 	};
 
-	if (isInEditMode && productQuery.isPending) {
-		return <ProductFormLoadingSkeleton />;
+	if ((isInEditMode && productQuery.isPending) || categoriesQuery.isPending) {
+		return <ProductFormLoadingSkeleton isInEditMode={isInEditMode} />;
 	}
 
 	if (isInEditMode && (productQuery.isError || productQuery.isError)) {

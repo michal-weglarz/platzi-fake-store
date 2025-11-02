@@ -1,15 +1,19 @@
 import PageHeader from "./PageHeader.tsx";
 
-function ProductFormLoadingSkeleton() {
+interface Props {
+	isInEditMode: boolean;
+}
+
+function ProductFormLoadingSkeleton(props: Props) {
 	return (
 		<div className={"flex flex-col gap-6"}>
 			<PageHeader
 				breadcrumbs={[
 					{ name: "Home", link: "/" },
 					{ name: "Products", link: "/products" },
-					{ name: "Edit product" },
+					{ name: props.isInEditMode ? "Edit product" : "Add product" },
 				]}
-				title={"Edit product"}
+				title={props.isInEditMode ? "Edit product" : "Add product"}
 			/>
 
 			<div className={"card bg-base-100 w-full shadow-sm p-4"}>

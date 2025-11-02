@@ -391,8 +391,8 @@ function ProductsPage() {
 											<td>{product.category.name}</td>
 											<td>${product.price}</td>
 											<th>
-												{auth.user && (
-													<div className="flex flex-row gap-2 items-center ">
+												<div className="flex flex-row gap-2 items-center ">
+													{auth.user && (
 														<div className="tooltip" data-tip="Edit">
 															<Link
 																className={"btn btn-sm btn-square btn-ghost"}
@@ -401,19 +401,19 @@ function ProductsPage() {
 																<EditIcon />
 															</Link>
 														</div>
+													)}
 
-														<div className="tooltip" data-tip="See details">
-															<Link
-																className={"btn btn-sm btn-square btn-ghost"}
-																to={`/products/${product.id}`}
-															>
-																<EyeIcon />
-															</Link>
-														</div>
-
-														<DeleteProductButton product={product} />
+													<div className="tooltip" data-tip="See details">
+														<Link
+															className={"btn btn-sm btn-square btn-ghost"}
+															to={`/products/${product.id}`}
+														>
+															<EyeIcon />
+														</Link>
 													</div>
-												)}
+
+													{auth.user && <DeleteProductButton product={product} />}
+												</div>
 											</th>
 										</tr>
 									))}

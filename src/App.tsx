@@ -11,7 +11,8 @@ import NotFoundPage from "./components/NotFoundPage.tsx";
 
 const LoginPage = lazy(() => import("./pages/login/LoginPage.tsx"));
 const ProductsPage = lazy(() => import("./pages/products/ProductsPage.tsx"));
-const AddNewProductPage = lazy(() => import("./pages/products/./ProductFormPage"));
+const ProductFormPage = lazy(() => import("./pages/products/./ProductFormPage"));
+const ProductDetailsPage = lazy(() => import("./pages/products/ProductDetailsPage.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -35,15 +36,19 @@ function App() {
 						<Route path="/products/new">
 							<Suspense fallback={<PageLoading />}>
 								<ProtectedRoute>
-									<AddNewProductPage />
+									<ProductFormPage />
 								</ProtectedRoute>
 							</Suspense>
 						</Route>
-						<Route path="/products/:id/" />
+						<Route path="/products/:id">
+							<Suspense fallback={<PageLoading />}>
+								<ProductDetailsPage />
+							</Suspense>
+						</Route>
 						<Route path="/products/:id/edit">
 							<Suspense fallback={<PageLoading />}>
 								<ProtectedRoute>
-									<AddNewProductPage />
+									<ProductFormPage />
 								</ProtectedRoute>
 							</Suspense>
 						</Route>
