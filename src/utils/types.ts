@@ -74,7 +74,7 @@ export interface AuthResponse {
 }
 
 export interface RefreshTokenRequest {
-	refresh_token: string;
+	refreshToken: string;
 }
 
 export interface AuthContextType {

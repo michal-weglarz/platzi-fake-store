@@ -7,21 +7,88 @@ import type {
 	LoginCredentials,
 	Product,
 	ProductsQueryParams,
-	RefreshTokenRequest,
 	UpdateProductData,
 	User,
 } from "./types.ts";
+import { isTokenExpiringSoon } from "./utils.ts";
+
+let isRefreshing = false;
+let refreshPromise: Promise<string> | null = null;
+
+const refreshAccessToken = async (): Promise<string> => {
+	const refreshToken = localStorage.getItem("refresh_token");
+	if (!refreshToken) {
+		throw new Error("Refresh token is missing");
+	}
+
+	// Direct axios call to avoid interceptor and prevent infinite loops
+	const response = await axios.post<AuthResponse>("https://api.escuelajs.co/api/v1/auth/refresh-token", {
+		refreshToken: refreshToken,
+	});
+
+	localStorage.setItem("access_token", response.data.access_token);
+	localStorage.setItem("refresh_token", response.data.refresh_token);
+
+	return response.data.access_token;
+};
 
 const apiConfig = axios.create({
 	baseURL: "https://api.escuelajs.co/api/v1/",
 });
 
 apiConfig.interceptors.request.use(
-	(config) => {
-		const token = localStorage.getItem("access_token");
-		if (token) {
-			config.headers.Authorization = `Bearer ${token}`;
+	async (config) => {
+		// Note: access token shouldn't really be stored on the client side at all. Ideally we'd pass it around in a
+		// httponly cookie, which is inaccessible from JavaScript, and therefore prevents XSS attacks.
+		// For the sake of brevity and having in mind this is merely a demo app, I'm going to use `localStorage` here.
+		// Otherwise, I'd have set up an additional proxy server (or e.g. use the BFF pattern).
+		const storedAccessToken = localStorage.getItem("access_token");
+		if (storedAccessToken) {
+			config.headers.Authorization = `Bearer ${storedAccessToken}`;
+
+			// The api docs say that "The access token is valid for 20 days, and the refresh token is valid for 10 hours."
+			// (see: https://fakeapi.platzi.com/en/rest/auth-jwt/#refreshing-access-token).
+			// This doesn't seem to make sense as it renders the refresh token virtually useless.
+			// However, I still implemented a sample refresh flow, just for the demonstration purposes.
+			// By tweaking the `bufferSeconds` below and setting it to some large values we can test it in action.
+			// E.g, 1_728_000 is equal to 20 days
+			if (isTokenExpiringSoon(storedAccessToken, 60)) {
+				if (isRefreshing && refreshPromise) {
+					try {
+						const newToken = await refreshPromise;
+						config.headers.Authorization = `Bearer ${newToken}`;
+						return config;
+					} catch (error) {
+						return Promise.reject(error);
+					}
+				}
+
+				// Start new refresh
+				isRefreshing = true;
+				refreshPromise = refreshAccessToken()
+					.then((newToken) => {
+						isRefreshing = false;
+						refreshPromise = null;
+						return newToken;
+					})
+					.catch((error) => {
+						isRefreshing = false;
+						refreshPromise = null;
+						localStorage.removeItem("access_token");
+						localStorage.removeItem("refresh_token");
+						throw error;
+					});
+
+				try {
+					const newToken = await refreshPromise;
+					config.headers.Authorization = `Bearer ${newToken}`;
+					return config;
+				} catch (error) {
+					return Promise.reject(error);
+				}
+			}
 		}
+
 		return config;
 	},
 	(error) => {
@@ -29,34 +96,56 @@ apiConfig.interceptors.request.use(
 	}
 );
 
+// Response interceptor acts as a safety net:
+// - Handles edge cases where proactive refresh didn't trigger
+// - Ensures failed requests are retried with fresh tokens
 apiConfig.interceptors.response.use(
 	(response) => {
 		return response;
 	},
 	async (error) => {
 		const originalRequest = error.config;
+
 		if (error.response?.status === 401 && !originalRequest._retry) {
 			originalRequest._retry = true;
-			try {
-				const refreshToken = localStorage.getItem("refresh_token");
-				if (!refreshToken) {
-					throw new Error("Refresh token is missing");
+
+			if (isRefreshing && refreshPromise) {
+				try {
+					const newToken = await refreshPromise;
+					originalRequest.headers.Authorization = `Bearer ${newToken}`;
+					return apiConfig(originalRequest);
+				} catch (refreshError) {
+					localStorage.removeItem("access_token");
+					localStorage.removeItem("refresh_token");
+					return Promise.reject(refreshError);
 				}
+			}
 
-				const response = await api.auth.refresh({ refresh_token: refreshToken });
+			// Start new refresh
+			isRefreshing = true;
+			refreshPromise = refreshAccessToken()
+				.then((newToken) => {
+					isRefreshing = false;
+					refreshPromise = null;
+					return newToken;
+				})
+				.catch((error) => {
+					isRefreshing = false;
+					refreshPromise = null;
+					localStorage.removeItem("access_token");
+					localStorage.removeItem("refresh_token");
+					throw error;
+				});
 
-				localStorage.setItem("access_token", response.access_token);
-				localStorage.setItem("refresh_token", response.refresh_token);
-
-				apiConfig.defaults.headers.Authorization = `Bearer ${response.access_token}`;
-				return apiConfig(originalRequest); // Retry the original request with the new access token.
+			try {
+				const newToken = await refreshPromise;
+				originalRequest.headers.Authorization = `Bearer ${newToken}`;
+				return apiConfig(originalRequest);
 			} catch (error) {
-				console.error("Token refresh failed:", error);
-				localStorage.removeItem("access_token");
-				localStorage.removeItem("refresh_token");
 				return Promise.reject(error);
 			}
 		}
+
 		return Promise.reject(error);
 	}
 );
@@ -115,15 +204,11 @@ const api = {
 
 		logout: async () => {
 			localStorage.removeItem("access_token");
+			localStorage.removeItem("refresh_token");
 		},
 
 		getProfile: async () => {
 			const response = await apiConfig.get<User>(`/auth/profile`);
-			return response.data;
-		},
-
-		refresh: async (data: RefreshTokenRequest) => {
-			const response = await apiConfig.post<AuthResponse>(`/auth/refresh`, data);
 			return response.data;
 		},
 	},

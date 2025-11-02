@@ -58,9 +58,8 @@ function ProductFormPage() {
 			queryClient.invalidateQueries({ queryKey: ["products"], exact: false });
 			navigate("/products");
 		},
-		onError: (error) => {
-			const message = (error as any).response.data.message[0] ?? "";
-			toast.error(`An error occurred while creating products: ${message}`);
+		onError: () => {
+			toast.error(`An error occurred while creating products`);
 		},
 	});
 
