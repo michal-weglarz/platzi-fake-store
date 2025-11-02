@@ -6,6 +6,7 @@ import PageLoading from "../../shared/PageLoading.tsx";
 import PageError from "../../shared/PageError.tsx";
 import { EditIcon } from "../../shared/Icons.tsx";
 import { useAuth } from "../../utils/useAuth.ts";
+import { getRelativeTime } from "../../utils/utils.ts";
 
 function ProductDetailsPage() {
 	const auth = useAuth();
@@ -21,7 +22,22 @@ function ProductDetailsPage() {
 			}
 			return null;
 		},
+		gcTime: 0,
 	});
+
+	const totalImgCount = productQuery.data?.images.length ?? 0;
+
+	const moveBackwards = (index: number) => {
+		let prevItem = index - 1;
+		if (prevItem < 0) prevItem = totalImgCount - 1;
+		return prevItem;
+	};
+
+	const moveForward = (index: number) => {
+		let nextItem = index + 1;
+		if (nextItem > totalImgCount - 1) nextItem = 0;
+		return nextItem;
+	};
 
 	if (productQuery.isPending) {
 		return <PageLoading />;
@@ -47,24 +63,43 @@ function ProductDetailsPage() {
 						<div id={index.toString()} key={image} className="carousel-item relative w-full">
 							<img
 								src={image}
-								className="w-full"
+								className="w-full object-cover p-4"
 								crossOrigin="anonymous"
 								alt={`${productQuery.data?.title ?? ""} product image`}
 								onError={(e) => {
 									e.currentTarget.src = "https://placehold.co/400x400";
 								}}
 							/>
-							<div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-								<a href={`#${Math.max(index - 1, 0)}`} className="btn btn-circle">
-									❮
-								</a>
-								<a
-									href={`#${Math.min(index + 1, (productQuery.data?.images.length ?? 1) - 1)}`}
-									className="btn btn-circle"
-								>
-									❯
-								</a>
-							</div>
+							{totalImgCount > 1 && (
+								<div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
+									<button
+										onClick={() => {
+											const prevIndex = moveBackwards(index);
+											document.getElementById(prevIndex.toString())?.scrollIntoView({
+												behavior: "smooth",
+												block: "nearest",
+												inline: "start",
+											});
+										}}
+										className="btn btn-circle"
+									>
+										❮
+									</button>
+									<button
+										onClick={() => {
+											const nextIndex = moveForward(index);
+											document.getElementById(nextIndex.toString())?.scrollIntoView({
+												behavior: "smooth",
+												block: "nearest",
+												inline: "start",
+											});
+										}}
+										className="btn btn-circle"
+									>
+										❯
+									</button>
+								</div>
+							)}
 						</div>
 					))}
 				</div>
@@ -73,10 +108,31 @@ function ProductDetailsPage() {
 					<span className="badge badge-xs badge-warning">{productQuery.data.category.name}</span>
 					<div className="flex justify-between">
 						<h2 className="text-3xl font-bold">{productQuery.data.title}</h2>
-						<span className="text-xl">${productQuery.data.price}</span>
+						<span className="text-3xl font-bold">${productQuery.data.price}</span>
 					</div>
 					<p>{productQuery.data.description}</p>
-					<div className="card-actions justify-end">
+					<div className="card-actions justify-end w-full items-end flex-1">
+						<div className="flex flex-col flex-1">
+							<div
+								className={"tooltip w-fit"}
+								data-tip={new Date(productQuery.data.creationAt).toLocaleString()}
+							>
+								<div className="text-base-content/60">
+									<span className="font-medium">Created:</span>{" "}
+									{getRelativeTime(productQuery.data.creationAt)}
+								</div>
+							</div>
+							<div
+								className={"tooltip w-fit"}
+								data-tip={new Date(productQuery.data.updatedAt).toLocaleString()}
+							>
+								<div className="text-base-content/60">
+									<span className="font-medium">Updated:</span>{" "}
+									{getRelativeTime(productQuery.data.updatedAt)}
+								</div>
+							</div>
+						</div>
+
 						{auth.user != null && (
 							<Link className="btn btn-primary" to={`/products/${productId}/edit`}>
 								<EditIcon />

@@ -72,9 +72,9 @@ function FileUpload(props: Props) {
 					</div>
 				</fieldset>
 
-				<div className={"self-center md:self-end pb-2"}>OR</div>
+				<div className={"self-center md:self-end md:pb-3"}>OR</div>
 
-				<form className="fieldset flex-1 w-full">
+				<div className="fieldset flex-1 w-full">
 					<fieldset>
 						<legend className="fieldset-legend">Enter image URL</legend>
 						<div className={"flex gap-2"}>
@@ -82,7 +82,7 @@ function FileUpload(props: Props) {
 								<input
 									id={"image-url-input"}
 									type="url"
-									className="input w-full validator"
+									className="input w-full "
 									placeholder="e.g. https://placehold.co/400x400"
 									disabled={uploadMutation.isPending}
 								/>
@@ -92,8 +92,14 @@ function FileUpload(props: Props) {
 							</div>
 						</div>
 					</fieldset>
-				</form>
+				</div>
 			</div>
+
+			{props.uploadedImages.length === 0 && (
+				<div role="alert" className="alert alert-info alert-soft mt-2">
+					<span>A product has to have at least one image.</span>
+				</div>
+			)}
 
 			{props.uploadedImages.length > 0 && (
 				<div className="mt-4">

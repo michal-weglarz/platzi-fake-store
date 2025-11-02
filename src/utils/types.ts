@@ -59,6 +59,7 @@ export interface UpdateProductData {
 	price?: number;
 	description?: string;
 	category?: Category;
+	categoryId?: number;
 	images?: string[];
 }
 

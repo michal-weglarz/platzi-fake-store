@@ -5,7 +5,7 @@ import { type ChangeEvent, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import PageHeader from "./PageHeader.tsx";
 import PageError from "../../shared/PageError.tsx";
-import type { Category, FileUploadResponse, UpdateProductData } from "../../utils/types.ts";
+import type { Category, CreateProductData, FileUploadResponse, UpdateProductData } from "../../utils/types.ts";
 import ProductFormLoadingSkeleton from "./ProductFormLoadingSkeleton.tsx";
 import FileUpload from "./FileUpload.tsx";
 
@@ -58,8 +58,9 @@ function ProductFormPage() {
 			queryClient.invalidateQueries({ queryKey: ["products"], exact: false });
 			navigate("/products");
 		},
-		onError: () => {
-			toast.error(`An error occurred while creating products!`);
+		onError: (error) => {
+			const message = (error as any).response.data.message[0] ?? "";
+			toast.error(`An error occurred while creating products: ${message}`);
 		},
 	});
 
@@ -68,10 +69,9 @@ function ProductFormPage() {
 		onSuccess: (data) => {
 			toast.success(`The product ${data.title} has been updated!`);
 			queryClient.invalidateQueries({ queryKey: ["products"], exact: false });
-			navigate("/products");
 		},
 		onError: () => {
-			toast.error(`An error occurred while updating product!`);
+			toast.error(`An error occurred while updating product`);
 		},
 	});
 
@@ -92,24 +92,29 @@ function ProductFormPage() {
 		if (isInEditMode) {
 			const params = {
 				id: productId,
-				data: {} as UpdateProductData,
+				data: {
+					title: title as string,
+					description: description as string,
+					price: parseInt(price as string),
+					// FIXME: Neither Category nor CategoryId works when trying to update a product. Why?
+					categoryId: parseInt(categoryId as string),
+					category: category,
+				} as UpdateProductData,
 			};
-			if (title) params.data["title"] = title as string;
-			if (description) params.data["description"] = description as string;
-			if (price) params.data["price"] = parseInt(price as string);
-			// FIXME: Neither Category nor CategoryId works when trying to update a product
-			if (category) params.data["category"] = category;
+
 			if (uploadedImages.length > 0) params.data["images"] = uploadedImages.map((image) => image.location);
 			editMutation.mutate(params);
 		} else {
 			if (title && description && price && category) {
-				createMutation.mutate({
+				const params = {
 					title: title as string,
 					description: description as string,
 					categoryId: parseInt(categoryId as string),
 					price: parseInt(price as string),
 					images: uploadedImages.map((image) => image.location),
-				});
+				} as CreateProductData;
+
+				createMutation.mutate(params);
 			} else {
 				toast.error("Missing required fields!");
 			}
@@ -125,7 +130,7 @@ function ProductFormPage() {
 	}
 
 	return (
-		<div className={"flex flex-col gap-6"}>
+		<div className={"flex flex-col gap-4"}>
 			<PageHeader
 				breadcrumbs={[
 					{ name: "Home", link: "/" },
@@ -143,35 +148,40 @@ function ProductFormPage() {
 							type="text"
 							name={"title"}
 							placeholder="Title"
-							className={"input w-full"}
+							className={"input w-full validator"}
 							defaultValue={productQuery.data?.title}
-							required={!isInEditMode}
+							required
 						/>
+						<div className="validator-hint hidden">Title can't be empty</div>
 					</fieldset>
 
 					<fieldset className={"fieldset flex-1 "}>
 						<legend className="fieldset-legend">Description</legend>
 						<textarea
-							className="textarea w-full"
+							className="textarea w-full validator"
 							placeholder="Description"
+							rows={4}
 							defaultValue={productQuery.data?.description}
-							required={!isInEditMode}
+							required
 							name="description"
 						></textarea>
+						<div className="validator-hint hidden">Description can't be empty</div>
 					</fieldset>
 
 					<div className="flex flex-row gap-2">
 						<fieldset className={"fieldset flex-1"}>
 							<legend className="fieldset-legend">Category</legend>
 							<select
-								className="select w-full"
-								required={!isInEditMode}
-								defaultValue={productQuery.data?.category.id}
+								className="select w-full validator"
+								required
+								defaultValue={productQuery.data?.category.id ?? ""}
 								name={"categoryId"}
 							>
 								{categoriesQuery.data ? (
 									<>
-										<option disabled>Category</option>
+										<option disabled value="">
+											Choose category
+										</option>
 										{categoriesQuery.data?.map((category) => (
 											<option key={category.id} value={category.id}>
 												{category.name}
@@ -182,6 +192,7 @@ function ProductFormPage() {
 									<option disabled>No available category</option>
 								)}
 							</select>
+							<p className="validator-hint hidden">Select a category</p>
 						</fieldset>
 
 						<fieldset className={"fieldset flex-1"}>
@@ -190,11 +201,12 @@ function ProductFormPage() {
 								type="number"
 								min="1"
 								placeholder="Price"
-								className={"input w-full"}
+								className={"input w-full validator"}
 								defaultValue={productQuery.data?.price}
-								required={!isInEditMode}
+								required
 								name="price"
 							/>
+							<p className="validator-hint hidden">Must be minium 1</p>
 						</fieldset>
 					</div>
 

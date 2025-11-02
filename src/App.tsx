@@ -57,7 +57,7 @@ function App() {
 						</Route>
 					</Switch>
 				</main>
-				<ToastContainer position="bottom-left" />
+				<ToastContainer position="bottom-right" />
 			</AuthProvider>
 			<ReactQueryDevtools initialIsOpen={false} />
 		</QueryClientProvider>
