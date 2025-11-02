@@ -11,15 +11,9 @@ import NotFoundPage from "./components/NotFoundPage.tsx";
 
 const LoginPage = lazy(() => import("./pages/login/LoginPage.tsx"));
 const ProductsPage = lazy(() => import("./pages/products/ProductsPage.tsx"));
-const AddNewProductPage = lazy(() => import("./pages/products/AddNewProductPage.tsx"));
+const AddNewProductPage = lazy(() => import("./pages/products/./ProductFormPage"));
 
-const queryClient = new QueryClient({
-	defaultOptions: {
-		queries: {
-			staleTime: 5 * 60 * 1_000, // 5 min
-		},
-	},
-});
+const queryClient = new QueryClient();
 
 function App() {
 	return (
@@ -45,9 +39,14 @@ function App() {
 								</ProtectedRoute>
 							</Suspense>
 						</Route>
-						<Route path="/products/new" />
 						<Route path="/products/:id/" />
-						<Route path="/products/:id/edit" />
+						<Route path="/products/:id/edit">
+							<Suspense fallback={<PageLoading />}>
+								<ProtectedRoute>
+									<AddNewProductPage />
+								</ProtectedRoute>
+							</Suspense>
+						</Route>
 						<Route>
 							<NotFoundPage />
 						</Route>

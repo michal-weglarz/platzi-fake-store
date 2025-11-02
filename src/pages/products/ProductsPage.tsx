@@ -61,9 +61,7 @@ function ProductsPage() {
 
 	const categoriesQuery = useQuery({
 		queryKey: ["categories"],
-		queryFn: async () => {
-			return api.categories.getAll();
-		},
+		queryFn: () => api.categories.getAll(),
 	});
 
 	const isPageLoading = productsQuery.isLoading || categoriesQuery.isLoading;
@@ -214,6 +212,10 @@ function ProductsPage() {
 	if (productsQuery.data && categoriesQuery.data) {
 		const areParamsValid = pageSize > 0 && page > 0;
 
+		if (!areParamsValid) {
+			return <PageError message={"Invalid URL parameters."} />;
+		}
+
 		return (
 			<div className={"flex flex-col gap-6 items-end"}>
 				<PageHeader
@@ -231,6 +233,7 @@ function ProductsPage() {
 					}
 				/>
 
+				{/* Main content area */}
 				<div className="card bg-base-100 w-full shadow-sm">
 					<div className={"flex flex-col-reverse md:flex-row gap-4 sm:justify-between items-center"}>
 						<div className={"flex flex-col md:flex-row gap-3 p-4 sm:justify-between w-full"}>
@@ -296,138 +299,140 @@ function ProductsPage() {
 
 					<div className="card-body">
 						<div className="overflow-x-auto">
-							{areParamsValid ? (
-								<table className="table">
-									<thead>
-										<tr>
-											<th
-												className={"hover:cursor-pointer hover:bg-slate-50"}
-												role={"button"}
-												onClick={() => {
-													if (sortBy === "title-asc") {
-														setSortBy("title-desc");
-													} else {
-														setSortBy("title-asc");
-													}
-												}}
-											>
-												<div className={"flex flex-row gap-2 items-center"}>
-													Title
-													{sortBy === "title-asc" && <ArrowUpIcon />}
-													{sortBy === "title-desc" && <ArrowDownIcon />}
-												</div>
-											</th>
-											<th
-												className={"hover:cursor-pointer hover:bg-slate-50"}
-												onClick={() => {
-													if (sortBy === "category-asc") {
-														setSortBy("category-desc");
-													} else {
-														setSortBy("category-asc");
-													}
-												}}
-											>
-												<div className={"flex flex-row gap-2 items-center"}>
-													Category
-													{sortBy === "category-asc" && <ArrowUpIcon />}
-													{sortBy === "category-desc" && <ArrowDownIcon />}
-												</div>
-											</th>
-											<th
-												className={"hover:cursor-pointer hover:bg-slate-50"}
-												onClick={() => {
-													if (sortBy === "price-asc") {
-														setSortBy("price-desc");
-													} else {
-														setSortBy("price-asc");
-													}
-												}}
-											>
-												<div className={"flex flex-row gap-2 items-center"}>
-													Price
-													{sortBy === "price-asc" && <ArrowUpIcon />}
-													{sortBy === "price-desc" && <ArrowDownIcon />}
-												</div>
-											</th>
-											<th className={"w-[100px]"}>Action</th>
-										</tr>
-									</thead>
-									<tbody>
-										{productsQuery.data.products.length === 0 && (
-											<tr>
-												<td colSpan={4}>
-													<div className={"flex flex-row justify-center items-center"}>
-														No product found
-													</div>
-												</td>
-											</tr>
-										)}
-										{productsQuery.data.products.sort(sortProducts).map((product) => (
-											<tr key={product.id}>
-												<td>
-													<div className="flex items-center gap-3">
-														<div className="avatar">
-															<div className="mask h-12 w-12">
-																<img src={product.images[0]} alt="Product image" />
-															</div>
-														</div>
-														<div>
-															<div className="font-bold line-clamp-1">
-																<Link
-																	to={`/products/${product.id}`}
-																	className="font-bold line-clamp-1 hover:underline"
-																>
-																	{product.title}
-																</Link>
-															</div>
-															<span className="badge badge-ghost badge-sm">
-																#{product.id}
-															</span>
-														</div>
-													</div>
-												</td>
-												<td>{product.category.name}</td>
-												<td>${product.price}</td>
-												<th>
-													{auth.user && (
-														<div className="flex flex-row gap-2 items-center ">
-															<div className="tooltip" data-tip="Edit">
-																<button className={"btn btn-sm btn-square btn-ghost"}>
-																	<EditIcon />
-																</button>
-															</div>
-
-															<div className="tooltip" data-tip="See details">
-																<button className={"btn btn-sm btn-square btn-ghost"}>
-																	<EyeIcon />
-																</button>
-															</div>
-
-															<DeleteProductButton product={product} />
-														</div>
-													)}
-												</th>
-											</tr>
-										))}
-									</tbody>
-									<tfoot>
+							<table className="table">
+								<thead>
+									<tr>
+										<th
+											className={"hover:cursor-pointer hover:bg-slate-50"}
+											role={"button"}
+											onClick={() => {
+												if (sortBy === "title-asc") {
+													setSortBy("title-desc");
+												} else {
+													setSortBy("title-asc");
+												}
+											}}
+										>
+											<div className={"flex flex-row gap-2 items-center"}>
+												Title
+												{sortBy === "title-asc" && <ArrowUpIcon />}
+												{sortBy === "title-desc" && <ArrowDownIcon />}
+											</div>
+										</th>
+										<th
+											className={"hover:cursor-pointer hover:bg-slate-50"}
+											onClick={() => {
+												if (sortBy === "category-asc") {
+													setSortBy("category-desc");
+												} else {
+													setSortBy("category-asc");
+												}
+											}}
+										>
+											<div className={"flex flex-row gap-2 items-center"}>
+												Category
+												{sortBy === "category-asc" && <ArrowUpIcon />}
+												{sortBy === "category-desc" && <ArrowDownIcon />}
+											</div>
+										</th>
+										<th
+											className={"hover:cursor-pointer hover:bg-slate-50"}
+											onClick={() => {
+												if (sortBy === "price-asc") {
+													setSortBy("price-desc");
+												} else {
+													setSortBy("price-asc");
+												}
+											}}
+										>
+											<div className={"flex flex-row gap-2 items-center"}>
+												Price
+												{sortBy === "price-asc" && <ArrowUpIcon />}
+												{sortBy === "price-desc" && <ArrowDownIcon />}
+											</div>
+										</th>
+										<th className={"w-[100px]"}>Action</th>
+									</tr>
+								</thead>
+								<tbody>
+									{productsQuery.data.products.length === 0 && (
 										<tr>
 											<td colSpan={4}>
-												<Pagination
-													page={page}
-													pageSize={pageSize}
-													changeSelectedPageSize={changeSelectedPageSize}
-													changeSelectedPage={changeSelectedPage}
-													total={productsQuery.data.total}
-													productsOnPage={productsQuery.data.products.length}
-												/>
+												<div className={"flex flex-row justify-center items-center"}>
+													No product found
+												</div>
 											</td>
 										</tr>
-									</tfoot>
-								</table>
-							) : (
-								<PageError message={"Invalid URL parameters."} />
-							)}
+									)}
+									{productsQuery.data.products.sort(sortProducts).map((product) => (
+										<tr key={product.id}>
+											<td>
+												<div className="flex items-center gap-3">
+													<div className="avatar">
+														<div className="mask h-12 w-12">
+															<img src={product.images[0]} alt="Product image" />
+														</div>
+													</div>
+													<div>
+														<div className="font-bold line-clamp-1">
+															<Link
+																to={`/products/${product.id}`}
+																className="font-bold line-clamp-1 hover:underline"
+															>
+																{product.title}
+															</Link>
+														</div>
+														<span className="badge badge-ghost badge-sm">
+															#{product.id}
+														</span>
+													</div>
+												</div>
+											</td>
+											<td>{product.category.name}</td>
+											<td>${product.price}</td>
+											<th>
+												{auth.user && (
+													<div className="flex flex-row gap-2 items-center ">
+														<div className="tooltip" data-tip="Edit">
+															<Link
+																className={"btn btn-sm btn-square btn-ghost"}
+																to={`/products/${product.id}/edit`}
+															>
+																<EditIcon />
+															</Link>
+														</div>
+
+														<div className="tooltip" data-tip="See details">
+															<Link
+																className={"btn btn-sm btn-square btn-ghost"}
+																to={`/products/${product.id}`}
+															>
+																<EyeIcon />
+															</Link>
+														</div>
+
+														<DeleteProductButton product={product} />
+													</div>
+												)}
+											</th>
+										</tr>
+									))}
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colSpan={4}>
+											<Pagination
+												page={page}
+												pageSize={pageSize}
+												changeSelectedPageSize={changeSelectedPageSize}
+												changeSelectedPage={changeSelectedPage}
+												total={productsQuery.data.total}
+												productsOnPage={productsQuery.data.products.length}
+											/>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
 						</div>
 					</div>
 				</div>
