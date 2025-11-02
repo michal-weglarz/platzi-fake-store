@@ -5,7 +5,7 @@ import { type ChangeEvent, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import PageHeader from "./PageHeader.tsx";
 import PageError from "../../shared/PageError.tsx";
-import type { FileUploadResponse, UpdateProductData } from "../../utils/types.ts";
+import type { Category, FileUploadResponse, UpdateProductData } from "../../utils/types.ts";
 import ProductFormLoadingSkeleton from "./ProductFormLoadingSkeleton.tsx";
 import FileUpload from "./FileUpload.tsx";
 
@@ -31,10 +31,13 @@ function ProductFormPage() {
 			}
 			return null;
 		},
+		// Need to ensure that when I re-enter the page I see the form with re-fetched up-to-date values.
+		gcTime: 0,
 	});
 
 	const [uploadedImages, setUploadedImages] = useState<FileUploadResponse[]>([]);
-	// Initialize uploadedImages when product data is loaded
+	// I need to store in the local state both the already added images and the images I'm about to upload.
+	// That's why I'm using this useEffect here.
 	useEffect(() => {
 		if (productQuery.isSuccess && productQuery.data && productQuery.data.images) {
 			const productQueryImages = productQuery.data.images.map((img) => ({
@@ -45,13 +48,6 @@ function ProductFormPage() {
 			setUploadedImages(productQueryImages);
 		}
 	}, [productQuery.isSuccess, productQuery.data]);
-
-	useEffect(() => {
-		// I want to ensure that when I re-enter the page I see the form with re-fetched up-to-date values.
-		return () => {
-			queryClient.removeQueries({ queryKey: ["product", productId] });
-		};
-	}, [queryClient, productId]);
 
 	const [isAddingImages, setIsAddingImages] = useState(false);
 
@@ -88,6 +84,11 @@ function ProductFormPage() {
 		const price = formData.get("price");
 		const categoryId = formData.get("categoryId");
 
+		let category: Category | null = null;
+		if (categoriesQuery.data) {
+			category = categoriesQuery.data.find((item) => item.id.toString() === categoryId) ?? null;
+		}
+
 		if (isInEditMode) {
 			const params = {
 				id: productId,
@@ -96,11 +97,12 @@ function ProductFormPage() {
 			if (title) params.data["title"] = title as string;
 			if (description) params.data["description"] = description as string;
 			if (price) params.data["price"] = parseInt(price as string);
-			if (categoryId) params.data["categoryId"] = parseInt(categoryId as string);
+			// FIXME: Neither Category nor CategoryId works when trying to update a product
+			if (category) params.data["category"] = category;
 			if (uploadedImages.length > 0) params.data["images"] = uploadedImages.map((image) => image.location);
 			editMutation.mutate(params);
 		} else {
-			if (title && description && price && categoryId) {
+			if (title && description && price && category) {
 				createMutation.mutate({
 					title: title as string,
 					description: description as string,

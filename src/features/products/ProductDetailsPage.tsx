@@ -68,7 +68,7 @@ function ProductDetailsPage() {
 					))}
 				</div>
 
-				<div className="card-body min-w-[800px]">
+				<div className="card-body lg:min-w-[800px]">
 					<span className="badge badge-xs badge-warning">{productQuery.data.category.name}</span>
 					<div className="flex justify-between">
 						<h2 className="text-3xl font-bold">{productQuery.data.title}</h2>
