@@ -373,6 +373,7 @@ function ProductsPage() {
 															<img
 																src={product.images[0]}
 																alt={`${product.title} product image`}
+																crossOrigin={"anonymous"}
 																onError={(e) => {
 																	e.currentTarget.src =
 																		"https://placehold.co/400x400";

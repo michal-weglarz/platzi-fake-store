@@ -44,7 +44,7 @@ function FileUpload(props: Props) {
 		e.preventDefault();
 		const input = document.getElementById("image-url-input") as HTMLInputElement | null;
 
-		if (input && input.checkValidity()) {
+		if (input && input.checkValidity() && input.value.length > 0) {
 			const newImage = {
 				filename: input.value,
 				originalname: input.value,
