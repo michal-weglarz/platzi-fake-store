@@ -48,6 +48,7 @@ function ProductDetailsPage() {
 							<img
 								src={image}
 								className="w-full"
+								crossOrigin="anonymous"
 								alt={`${productQuery.data?.title ?? ""} product image`}
 								onError={(e) => {
 									e.currentTarget.src = "https://placehold.co/400x400";

@@ -3,7 +3,6 @@ import type { FileUploadResponse } from "../../utils/types.ts";
 import { useMutation } from "@tanstack/react-query";
 import api from "../../utils/api.ts";
 import { toast } from "react-toastify";
-import { useState } from "react";
 
 interface Props {
 	uploadedImages: FileUploadResponse[];
@@ -13,8 +12,6 @@ interface Props {
 }
 
 function FileUpload(props: Props) {
-	const [imageUrl, setImageUrl] = useState<string>("");
-
 	const uploadMutation = useMutation({
 		mutationFn: api.files.uploadMultiple,
 		onMutate: () => {
@@ -43,11 +40,25 @@ function FileUpload(props: Props) {
 		props.setUploadedImages((prev) => prev.filter((_, i) => i !== index));
 	};
 
+	const addImageByUrl = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+		e.preventDefault();
+		const input = document.getElementById("image-url-input") as HTMLInputElement | null;
+
+		if (input && input.checkValidity()) {
+			const newImage = {
+				filename: input.value,
+				originalname: input.value,
+				location: input.value,
+			} satisfies FileUploadResponse;
+			props.setUploadedImages((prev) => [...prev, newImage]);
+		}
+	};
+
 	return (
 		<div>
-			<div className={"flex flex-row gap-4 items-center justify-stretch"}>
+			<div className={"flex flex-col md:flex-row gap-4 items-center justify-center md:justify-stretch"}>
 				<fieldset className="fieldset flex-1 w-full">
-					<legend className="fieldset-legend">Pick files</legend>
+					<legend className="fieldset-legend">Pick image files</legend>
 					<div className={"flex flex-row gap-2"}>
 						<input
 							type="file"
@@ -61,7 +72,7 @@ function FileUpload(props: Props) {
 					</div>
 				</fieldset>
 
-				<div className={"self-end pb-2"}>OR</div>
+				<div className={"self-center md:self-end pb-2"}>OR</div>
 
 				<form className="fieldset flex-1 w-full">
 					<fieldset>
@@ -74,29 +85,8 @@ function FileUpload(props: Props) {
 									className="input w-full validator"
 									placeholder="e.g. https://placehold.co/400x400"
 									disabled={uploadMutation.isPending}
-									value={imageUrl}
-									onChange={(e) => setImageUrl(e.target.value)}
 								/>
-								<button
-									className={"btn join-item"}
-									onClick={(e) => {
-										e.preventDefault();
-										const imageUrlInput = document.getElementById(
-											"image-url-input"
-										) as HTMLInputElement | null;
-										if (imageUrl === "" || imageUrlInput == null) return;
-
-										if (imageUrlInput.checkValidity()) {
-											const newImage = {
-												filename: imageUrl,
-												originalname: imageUrl,
-												location: imageUrl,
-											};
-											props.setUploadedImages((prev) => [...prev, newImage]);
-											setImageUrl("");
-										}
-									}}
-								>
+								<button className={"btn join-item"} onClick={addImageByUrl}>
 									Add
 								</button>
 							</div>
@@ -112,10 +102,10 @@ function FileUpload(props: Props) {
 						{props.uploadedImages.map((image, index) => (
 							<div key={index} className="flex flex-row flex-wrap gap-2">
 								<div className={"tooltip"} data-tip={image.filename}>
-									{/*Can't display an image because of the CORS issue*/}
 									<img
 										src={image.location}
 										alt={`Upload ${index + 1}`}
+										crossOrigin="anonymous"
 										className="w-20 h-20 object-cover rounded"
 										onError={(e) => {
 											e.currentTarget.src = "https://placehold.co/400x400";
