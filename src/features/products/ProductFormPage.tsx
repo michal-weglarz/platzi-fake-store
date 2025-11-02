@@ -1,7 +1,7 @@
 import { useLocation, useParams } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../../utils/api.ts";
-import { type ChangeEvent, useState } from "react";
+import { type ChangeEvent, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import PageHeader from "./PageHeader.tsx";
 import PageError from "../../shared/PageError.tsx";
@@ -31,16 +31,28 @@ function ProductFormPage() {
 			}
 			return null;
 		},
-		// In a scenario where I edit a product, go to the products list and then immediately go back to the edit page,
-		// I want to make sure the query is invalidated and I always get to see the latest results.
-		staleTime: 0,
-		gcTime: 0,
 	});
 
-	const productQueryImages = productQuery.data
-		? productQuery.data.images.map((img) => ({ filename: img, location: img, originalname: img }))
-		: [];
-	const [uploadedImages, setUploadedImages] = useState<FileUploadResponse[]>(productQueryImages);
+	const [uploadedImages, setUploadedImages] = useState<FileUploadResponse[]>([]);
+	// Initialize uploadedImages when product data is loaded
+	useEffect(() => {
+		if (productQuery.isSuccess && productQuery.data && productQuery.data.images) {
+			const productQueryImages = productQuery.data.images.map((img) => ({
+				filename: img,
+				location: img,
+				originalname: img,
+			}));
+			setUploadedImages(productQueryImages);
+		}
+	}, [productQuery.isSuccess, productQuery.data]);
+
+	useEffect(() => {
+		// I want to ensure that when I re-enter the page I see the form with re-fetched up-to-date values.
+		return () => {
+			queryClient.removeQueries({ queryKey: ["product", productId] });
+		};
+	}, [queryClient, productId]);
+
 	const [isAddingImages, setIsAddingImages] = useState(false);
 
 	const createMutation = useMutation({
