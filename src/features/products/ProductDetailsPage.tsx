@@ -58,7 +58,7 @@ function ProductDetailsPage() {
 				title={""}
 			/>
 			<div className="card lg:card-side bg-base-100 shadow-sm">
-				<div className="carousel w-full">
+				<div className="carousel w-full md:min-w-[400px] md:h-[400px]">
 					{productQuery.data.images.map((image, index) => (
 						<div id={index.toString()} key={image} className="carousel-item relative w-full">
 							<img
@@ -104,7 +104,7 @@ function ProductDetailsPage() {
 					))}
 				</div>
 
-				<div className="card-body lg:min-w-[800px]">
+				<div className="card-body">
 					<span className="badge badge-xs badge-warning">{productQuery.data.category.name}</span>
 					<div className="flex justify-between">
 						<h2 className="text-3xl font-bold">{productQuery.data.title}</h2>
