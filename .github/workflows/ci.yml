@@ -1,7 +1,7 @@
 name: CI
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
