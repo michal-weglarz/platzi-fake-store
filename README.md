@@ -4,6 +4,10 @@
 
 E-commerce application built with React, TypeScript, and Vite, consuming the Platzi Fake Store API.
 
+# Live preview
+
+- https://platzi-fake-store.michalweglarz.com
+
 ## Tech Stack
 
 - React 18
