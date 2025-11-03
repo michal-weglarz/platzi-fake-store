@@ -4,9 +4,24 @@
 
 E-commerce application built with React, TypeScript, and Vite, consuming the Platzi Fake Store API.
 
-# Live preview
+![Screenshot 2025-11-03 at 14.03.53.png](public/Screenshot%202025-11-03%20at%2014.03.53.png)
+
+## Live preview
 
 - https://platzi-fake-store.michalweglarz.com
+
+## Access
+
+All users can view products by entering these urls:
+
+- `/products`
+- `/products/:id`
+
+Only authenticated users can access:
+
+- `/products/new`
+- `/products/:id/edit`
+- Delete action
 
 ## Tech Stack
 
