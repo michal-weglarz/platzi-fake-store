@@ -106,8 +106,8 @@ function ProductDetailsPage() {
 
 				<div className="card-body flex-1">
 					<span className="badge badge-xs badge-warning">{productQuery.data.category.name}</span>
-					<div className="flex justify-between">
-						<h2 className="text-3xl font-bold">{productQuery.data.title}</h2>
+					<div className="flex justify-between gap-2 flex-col md:flex-row">
+						<h2 className="text-3xl font-bold break-after-auto">{productQuery.data.title}</h2>
 						<span className="text-3xl font-bold">${productQuery.data.price}</span>
 					</div>
 					<p>{productQuery.data.description}</p>
