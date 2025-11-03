@@ -1,6 +1,4 @@
 name: CI
-author: michalweglarz
-description: workflows
 
 on:
   pull_request:
