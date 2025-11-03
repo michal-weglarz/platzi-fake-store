@@ -58,6 +58,7 @@ platzi-fake-store/
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
+├── .prettierrc
 └── eslint.config.js
 ```
 
