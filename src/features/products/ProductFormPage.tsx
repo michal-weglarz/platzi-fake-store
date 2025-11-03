@@ -104,7 +104,7 @@ function ProductFormPage() {
 			if (uploadedImages.length > 0) params.data["images"] = uploadedImages.map((image) => image.location);
 			editMutation.mutate(params);
 		} else {
-			if (title && description && price && category) {
+			if (title && description && price && category && uploadedImages.length > 0) {
 				const params = {
 					title: title as string,
 					description: description as string,
@@ -115,7 +115,21 @@ function ProductFormPage() {
 
 				createMutation.mutate(params);
 			} else {
-				toast.error("Missing required fields!");
+				const missingFields = [];
+				if (uploadedImages.length === 0) {
+					missingFields.push("images");
+				}
+				if (!title) {
+					missingFields.push("title");
+				}
+				if (!price) {
+					missingFields.push("price");
+				}
+				if (!category) {
+					missingFields.push("category");
+				}
+
+				toast.error(`Missing required fields: ${missingFields.join(", ")}`);
 			}
 		}
 	};
