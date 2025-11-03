@@ -27,7 +27,7 @@ function ProductDetailsPage() {
 
 	const totalImgCount = productQuery.data?.images.length ?? 0;
 
-	const moveBackwards = (index: number) => {
+	const moveBack = (index: number) => {
 		let prevItem = index - 1;
 		if (prevItem < 0) prevItem = totalImgCount - 1;
 		return prevItem;
@@ -74,7 +74,7 @@ function ProductDetailsPage() {
 								<div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
 									<button
 										onClick={() => {
-											const prevIndex = moveBackwards(index);
+											const prevIndex = moveBack(index);
 											document.getElementById(prevIndex.toString())?.scrollIntoView({
 												behavior: "smooth",
 												block: "nearest",

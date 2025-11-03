@@ -10,17 +10,12 @@ interface Props {
 
 function DeleteProductButton(props: Props) {
 	const queryClient = useQueryClient();
-	// const [, setSearchParams] = useSearchParams();
 
 	const mutation = useMutation({
 		mutationFn: api.products.delete,
 		onSuccess: () => {
 			toast.success(`Product ${props.product.title} has been deleted!`);
 			queryClient.refetchQueries({ queryKey: ["products"], exact: false });
-			// setSearchParams((prev) => {
-			// 	prev.set("page", "0");
-			// 	return prev;
-			// });
 		},
 		onError: () => {
 			toast.error(`An error occurred while deleting the product!`);
