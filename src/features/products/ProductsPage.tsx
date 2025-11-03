@@ -20,6 +20,7 @@ function ProductsPage() {
 	const pageSizeParam = searchParams.get("pageSize");
 
 	const page = pageParam ? parseInt(pageParam) : DEFAULT_PAGE;
+
 	const pageSize = pageSizeParam ? parseInt(pageSizeParam) : DEFAULT_PAGE_SIZE;
 	const sortBy = (searchParams.get("sortBy") ?? DEFAULT_SORT_BY) as SortBy;
 	const title = searchParams.get("title") ?? "";
