@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent } from "react";
 import { useLocation } from "wouter";
 import { toast } from "react-toastify";
-import type { User } from "../../utils/types.ts";
+import type { User } from "../../types.ts";
 
 function LoginPage() {
 	const queryClient = useQueryClient();

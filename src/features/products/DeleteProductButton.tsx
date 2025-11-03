@@ -2,7 +2,7 @@ import { DeleteIcon } from "../../shared/Icons.tsx";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../../utils/api.ts";
 import { toast } from "react-toastify";
-import type { Product } from "../../utils/types.ts";
+import type { Product } from "../../types.ts";
 
 interface Props {
 	product: Product;

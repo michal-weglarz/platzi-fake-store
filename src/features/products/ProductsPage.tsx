@@ -3,7 +3,7 @@ import { type ChangeEvent } from "react";
 import { Link, useSearchParams } from "wouter";
 import Pagination from "./Pagination.tsx";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, DEFAULT_SORT_BY } from "../../utils/consts.ts";
-import type { Product, SortBy } from "../../utils/types.ts";
+import type { Product, SortBy } from "../../types.ts";
 import { ArrowDownIcon, ArrowUpIcon, EditIcon, EyeIcon, PlusIcon, SearchIcon } from "../../shared/Icons.tsx";
 import { debounce } from "../../utils/utils.ts";
 import api from "../../utils/api.ts";

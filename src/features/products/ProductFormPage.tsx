@@ -5,7 +5,7 @@ import { type ChangeEvent, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import PageHeader from "./PageHeader.tsx";
 import PageError from "../../shared/PageError.tsx";
-import type { Category, CreateProductData, FileUploadResponse, UpdateProductData } from "../../utils/types.ts";
+import type { Category, CreateProductData, FileUploadResponse, UpdateProductData } from "../../types.ts";
 import ProductFormLoadingSkeleton from "./ProductFormLoadingSkeleton.tsx";
 import FileUpload from "./FileUpload.tsx";
 

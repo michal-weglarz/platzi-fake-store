@@ -9,7 +9,7 @@ import type {
 	ProductsQueryParams,
 	UpdateProductData,
 	User,
-} from "./types.ts";
+} from "../types.ts";
 import { isTokenExpiringSoon } from "./utils.ts";
 
 let isRefreshing = false;

@@ -1,84 +1,66 @@
-# Platzi Fake Store
-
 [![CI](https://github.com/michal-weglarz/platzi-fake-store/actions/workflows/ci.yml/badge.svg)](https://github.com/michal-weglarz/platzi-fake-store/actions/workflows/ci.yml)
 
-# React + TypeScript + Vite
+# Platzi Fake Store
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+E-commerce application built with React, TypeScript, and Vite, consuming the Platzi Fake Store API.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react)
-  uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used
-  in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc)
-  uses [SWC](https://swc.rs/) for Fast Refresh
+- React 18
+- TypeScript
+- Wouter
+- Tanstack Query
+- DaisyUI + TailwindCSS
+- Vite, Vitest
+- ESLint, Prettier
+- [Platzi Fake Store API](https://fakeapi.platzi.com/)
 
-## React Compiler
+## Prerequisites
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it,
-see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js (version 20.x or higher)
+- npm
 
-## Expanding the ESLint configuration
+## Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-    globalIgnores(['dist']),
-    {
-        files: ['**/*.{ts,tsx}'],
-        extends: [
-            // Other configs...
-
-            // Remove tseslint.configs.recommended and replace with this
-            tseslint.configs.recommendedTypeChecked,
-            // Alternatively, use this for stricter rules
-            tseslint.configs.strictTypeChecked,
-            // Optionally, add this for stylistic rules
-            tseslint.configs.stylisticTypeChecked,
-
-            // Other configs...
-        ],
-        languageOptions: {
-            parserOptions: {
-                project: ['./tsconfig.node.json', './tsconfig.app.json'],
-                tsconfigRootDir: import.meta.dirname,
-            },
-            // other options...
-        },
-    },
-])
+```bash
+git clone https://github.com/michal-weglarz/platzi-fake-store.git
+cd platzi-fake-store
+npm install
+npm run dev
 ```
 
-You can also
-install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x)
-and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom)
-for React-specific lint rules:
+## Available Scripts
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+- `npm run test` - Run tests
 
-export default defineConfig([
-    globalIgnores(['dist']),
-    {
-        files: ['**/*.{ts,tsx}'],
-        extends: [
-            // Other configs...
-            // Enable lint rules for React
-            reactX.configs['recommended-typescript'],
-            // Enable lint rules for React DOM
-            reactDom.configs.recommended,
-        ],
-        languageOptions: {
-            parserOptions: {
-                project: ['./tsconfig.node.json', './tsconfig.app.json'],
-                tsconfigRootDir: import.meta.dirname,
-            },
-            // other options...
-        },
-    },
-])
+## Project Structure
+
 ```
+platzi-fake-store/
+├── src/
+│   ├── shared/         # Reusable components
+│   ├── features/       # Main feature groups
+│   ├── utils/          # Utility functions
+│   ├── types.ts        # TypeScript types
+│   ├── index.css        
+│   ├── App.tsx
+│   └── main.tsx
+├── public/
+├── index.html
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+└── eslint.config.js
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+Production files are generated in the `dist` directory.

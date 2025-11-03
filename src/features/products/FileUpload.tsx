@@ -1,5 +1,5 @@
 import { DeleteIcon } from "../../shared/Icons.tsx";
-import type { FileUploadResponse } from "../../utils/types.ts";
+import type { FileUploadResponse } from "../../types.ts";
 import { useMutation } from "@tanstack/react-query";
 import api from "../../utils/api.ts";
 import { toast } from "react-toastify";
