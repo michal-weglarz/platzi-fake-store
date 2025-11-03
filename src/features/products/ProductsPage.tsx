@@ -321,7 +321,7 @@ function ProductsPage() {
 											</div>
 										</th>
 										<th
-											className={"hover:cursor-pointer hover:bg-slate-50"}
+											className={"hover:cursor-pointer hover:bg-slate-50 w-[200px]"}
 											onClick={() => {
 												if (sortBy === "category-asc") {
 													setSortBy("category-desc");
@@ -337,7 +337,7 @@ function ProductsPage() {
 											</div>
 										</th>
 										<th
-											className={"hover:cursor-pointer hover:bg-slate-50"}
+											className={"hover:cursor-pointer hover:bg-slate-50 w-[150px]"}
 											onClick={() => {
 												if (sortBy === "price-asc") {
 													setSortBy("price-desc");
